@@ -1,0 +1,48 @@
+<?php
+
+/*
+ * Copyright (C) 2013 Sascha Tasche <sascha@mitgedanken.de>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+namespace mitgedanken\Monetary\Exception;
+
+/**
+ * UnsupportedOpertationException
+ *
+ * @author Sascha Tasche <sascha@mitgedanken.de>
+ */
+class UnsupportedOperationException extends Exception {
+  /**
+   * Exception code.
+   */
+  const CODE = 405;
+
+  /**
+   * Construct this exception. 
+   *
+   * @param string $message [recommended] Exception message.
+   * @param integer $code [recommended] Exception code.
+   * @param \Exception $previous [optional] Previous exception.
+   */
+  public function __construct($message = NULL, $code = NULL,
+          \Exception $previous = NULL)
+  {
+    $code    = isset($code) ? $code : self::CODE;
+    $message = isset($message) ? 'Unsupported operation.' : $message;
+    parent::__construct($this->format($message), $code, $previous);
+  }
+
+}

@@ -213,3 +213,6 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+/src/DisplayLocales.php
+/src/mitgedanken/Monetary/Util/
+/src/mitgedanken/Monetary/Error/
