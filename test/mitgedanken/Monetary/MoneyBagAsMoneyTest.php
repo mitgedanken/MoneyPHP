@@ -176,9 +176,9 @@ class MoneyBagAsMoneyTest extends PHPUnit_Framework_TestCase {
   /**
    * @test
    * @covers mitgedanken\Monetary\Money::add
-   * @expectedException \mitgedanken\Monetary\Exception\DifferentCurrenciesException
+   * @expectedException \mitgedanken\Monetary\Exception\DifferentCurrencies
    */
-  public function addDifferentCurrenciesException()
+  public function addDifferentCurrencies()
   {
     $other = new Money(1, new Currency('USD'));
     $this->eur->add($other, TRUE);
@@ -199,9 +199,9 @@ class MoneyBagAsMoneyTest extends PHPUnit_Framework_TestCase {
   /**
    * @test
    * @covers mitgedanken\Monetary\Money::subtract
-   * @expectedException \mitgedanken\Monetary\Exception\DifferentCurrenciesException
+   * @expectedException \mitgedanken\Monetary\Exception\DifferentCurrencies
    */
-  public function subtractDifferentCurrenciesException()
+  public function subtractDifferentCurrencies()
   {
     $other = new Money(1, new Currency('USD'));
     $this->eur->subtract($other);
@@ -231,9 +231,9 @@ class MoneyBagAsMoneyTest extends PHPUnit_Framework_TestCase {
   /**
    * @test
    * @covers mitgedanken\Monetary\Money::multiply
-   * @expectedException \mitgedanken\Monetary\Exception\DifferentCurrenciesException
+   * @expectedException \mitgedanken\Monetary\Exception\DifferentCurrencies
    */
-  public function multiplyDifferentCurrenciesException()
+  public function multiplyDifferentCurrencies()
   {
     $this->eur->multiply($this->usd);
   }
@@ -251,7 +251,7 @@ class MoneyBagAsMoneyTest extends PHPUnit_Framework_TestCase {
   /**
    * @test
    * @covers mitgedanken\Monetary\Money::divide
-   * @expectedException mitgedanken\Monetary\Exception\DivisionByZeroException
+   * @expectedException mitgedanken\Monetary\Exception\DivisionByZero
    */
   public function divisionByZero()
   {
@@ -279,7 +279,7 @@ class MoneyBagAsMoneyTest extends PHPUnit_Framework_TestCase {
   /**
    * @test
    * @covers mitgedanken\Monetary\Money::compare
-   * @expectedException mitgedanken\Monetary\Exception\DifferentCurrenciesException
+   * @expectedException mitgedanken\Monetary\Exception\DifferentCurrencies
    */
   public function compareException()
   {
@@ -302,9 +302,9 @@ class MoneyBagAsMoneyTest extends PHPUnit_Framework_TestCase {
    * @test If they currencies are unequal, an exception must be thrown.
    * @depends compareException
    * @covers mitgedanken\Monetary\Money::greaterThan
-   * @expectedException mitgedanken\Monetary\Exception\DifferentCurrenciesException
+   * @expectedException mitgedanken\Monetary\Exception\DifferentCurrencies
    */
-  public function greaterThanDifferentCurrenciesException()
+  public function greaterThanDifferentCurrencies()
   {
     $other = new Money($this->amount + 10, new Currency('EUR'));
     $other->greaterThan($this->usd);
@@ -326,7 +326,7 @@ class MoneyBagAsMoneyTest extends PHPUnit_Framework_TestCase {
    * @test If they currencies are unequal, an exception must be thrown.
    * @depends compareException
    * @covers mitgedanken\Monetary\Money::lessThan
-   * @expectedException mitgedanken\Monetary\Exception\DifferentCurrenciesException
+   * @expectedException mitgedanken\Monetary\Exception\DifferentCurrencies
    */
   public function lessThanException()
   {

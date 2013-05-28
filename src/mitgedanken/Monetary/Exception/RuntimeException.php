@@ -20,40 +20,17 @@
 namespace mitgedanken\Monetary\Exception;
 
 /**
- * A monetary exception.
+ * Description of RuntimeException
  *
  * @author Sascha Tasche <sascha@mitgedanken.de>
  */
-class Exception extends \Exception implements MonetaryException {
+class RuntimeException extends Exception {
 
-  /**
-   * Exception code.
-   */
-  const CODE = 0;
+  const CODE = -1;
 
-  /**
-   * Constructs this exception.
-   *
-   * @param string $message [recommended] Exception message.
-   * @param integer $code [recommended]  Exception code.
-   * @param \Exception $previous [optional] Previous exception.
-   */
-  public function __construct($message = NULL, $code = NULL,
-                              \Exception $previous = NULL)
-  {
-    $code = isset($code) ? $code : static::CODE;
-    $message = $this->format($message);
-    parent::__construct($message, $code, $previous);
-  }
-
-  /**
-   * Formats the message string for an exception.
-   *
-   * @param string $causeMessage [recommended] A detailed message about the cause.
-   */
   protected function format($causeMessage = NULL)
   {
-    $message = 'A monetary exception, ';
+    $message = 'RuntimeException, ';
     $message .= ' caused by: ' . \trim($causeMessage);
     return $message;
   }

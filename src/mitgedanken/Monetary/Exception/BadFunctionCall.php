@@ -19,30 +19,13 @@
 
 namespace mitgedanken\Monetary\Exception;
 
-/**
- * InvalidArgumentException.
+/** TODO
+ * BadFunctionCallException.
  *
  * @author Sascha Tasche <sascha@mitgedanken.de>
  */
-class InvalidArgumentException extends LogicException {
-  /**
-   * Exception code.
-   */
-  const CODE = 1400;
+class BadFunctionCall extends LogicException {
 
-  /**
-   * Formats the message string for this exception.
-   *
-   * @param string $causeMessage
-   */
-  protected function format($causeMessage = NULL)
-  {
-    $message = 'Invalid argument';
-    if (!empty($causeMessage) && 0 < \strlen($message)):
-      $causeMessage = \trim($causeMessage);
-      $message .= '; caused by: ' . $causeMessage;
-    endif;
-    return $message .= '.';
-  }
+  const CODE = 1001;
 
 }

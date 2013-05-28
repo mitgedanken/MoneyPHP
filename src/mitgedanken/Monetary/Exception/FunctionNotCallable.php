@@ -20,28 +20,26 @@
 namespace mitgedanken\Monetary\Exception;
 
 /**
- * DifferentCurrenciesException.
+ * FunctionNotCallable.
  *
  * @author Sascha Tasche <sascha@mitgedanken.de>
  */
-class DifferentCurrenciesException extends LogicException {
+class FunctionNotCallable extends BadFunctionCall {
+
   /**
    * Exception code.
    */
-  const CODE = 1401;
+  const CODE = 1404;
 
   /**
-   * Formats the message string for this exception.
+   * Formats the message String for this Exception.
    *
-   * @param string $causeMessage
+   * @param string $function
    */
-  protected function format($causeMessage = NULL)
+  public static function format($function, $causeMessage = NULL)
   {
-    $this->message = 'Different currencies';
-    if (!isset($causeMessage)):
-      $this->message .= ' ' + \trim($causeMessage);
-    endif;
-    $this->message += '.';
+    $message = "Function $function is not callable,";
+    $message .= ' caused by: ' . \trim($causeMessage);
+    return $message;
   }
-
 }

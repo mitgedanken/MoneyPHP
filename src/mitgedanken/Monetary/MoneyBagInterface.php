@@ -22,14 +22,30 @@ namespace mitgedanken\Monetary;
 /**
  * <i>Immutable</i><br/>
  * This interface specifies a money bag implementation.<br/>
- * It must be guarantee that each element is contained only once.
+ * It guarantees that each element is contained only once.
  *
  * @author Sascha Tasche <sascha@mitgedanken.de>
  */
 interface MoneyBagInterface extends MoneyInterface {
 
   /**
-   * Adds a MoneyValue object to this MoneyBag.
+   * <i>Override</i>
+   * It throws a <i>DifferentCurrencies</i> only if it is used in
+   * compat mode. If compat mode is used, it will throw a <i>DifferentCurrencies</i>
+   * if <b>$addend</b> has a different currency.
+   *
+   * @param \mitgedanken\Monetary\MoneyInterface $addend
+   * @param bool $compatMode [default: FALSE] <i>TRUE</i> to using compat mode.
+   * @return \mitgedanken\Monetary\MoneyInterface
+   * @throws UnsupportedOperationException
+   *    If $addend is not an instance of <i>MoneyBagInterface</i> or <i>MoneyInterface</i>.
+   * @throws DifferentCurrencies
+   *    If $compatMode is <i>TRUE</i> and if $addend has a different currency.
+   */
+  function add(MoneyInterface $addend, $compatMode = FALSE);
+
+  /**
+   * Adds a <i>Money</i> object to this MoneyBag.
    * @see \mitgedanken\Monetary\MoneyInterface::add
    *
    * @param \mitgedanken\Monetary\MoneyInterface $money
@@ -79,7 +95,17 @@ interface MoneyBagInterface extends MoneyInterface {
    *
    * @return void No return value
    */
-  function amountToTotal();
+  function toTotalAmount();
+
+  /**
+   * <i>Changes its state</i><br/>
+   * Deletes a money from the storage.
+   *
+   * @param \mitgedanken\Monetary\MoneyInterface $delete
+   * @param type $onlybyCurrency Set to <i>TRUE</i> if the deletion should be
+   *        performed only via currency of $delete.
+   */
+  function deleteMoney(MoneyInterface $delete, $onlybyCurrency = FALSE);
 
   /**
    * Return count of all monies.

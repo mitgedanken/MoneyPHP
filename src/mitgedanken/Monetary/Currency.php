@@ -18,8 +18,8 @@
  */
 
 namespace mitgedanken\Monetary;
-use mitgedanken\Monetary\Exception\LengthException,
-    mitgedanken\Monetary\Exception\InvalidArgumentException;
+use mitgedanken\Monetary\Exception\Length,
+    mitgedanken\Monetary\Exception\InvalidArgument;
 
 /**
  * <i>Immutable</i><br/>
@@ -54,13 +54,13 @@ class Currency implements CurrencyInterface {
 
     if (!\is_string($code)):
       $message = '$code is not a String; given: ' . \gettype($code);
-      throw new InvalidArgumentException($message);
+      throw new InvalidArgument($message);
     endif;
 
     $strlen = \strlen($code);
     if (3 != $strlen):
       $message = '$code must be 3 characters long; given: ' . $strlen;
-      throw new LengthException($message);
+      throw new Length($message);
     endif;
 
     $this->code = \strtoupper($code);

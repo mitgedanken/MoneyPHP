@@ -19,14 +19,18 @@
 
 namespace mitgedanken\Monetary\Exception;
 
-/** TODO
- * BadArgumentException.
+/**
+ * Description of NoSuitableExchangeRate
  *
  * @author Sascha Tasche <sascha@mitgedanken.de>
  */
-class BadArgumentException extends LogicException {
-  /**
-   * Exception code.
-   */
-  const CODE = 1400;
+class NoSuitableExchangeRate extends RuntimeException {
+
+  protected function format($causeMessage = NULL)
+  {
+    $message = 'No suitable exchange rate found, ';
+    $message .= ' caused by: ' . \trim($causeMessage);
+    return $message;
+  }
 }
+

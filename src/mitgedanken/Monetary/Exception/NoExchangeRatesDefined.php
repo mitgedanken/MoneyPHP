@@ -19,26 +19,23 @@
 
 namespace mitgedanken\Monetary\Exception;
 
-class DivisionByZeroException extends InvalidArgumentException {
-  /**
-   * Exception code.
-   */
-  const CODE = 1418;
+/**
+ * Description of NoSuitableMoney
+ *
+ * @author Sascha Tasche <sascha@mitgedanken.de>
+ */
+class NoExchangeRatesDefined extends RuntimeException {
 
-  /**
-   * Constructs this exception.
-   *
-   * @param string $message [recommended] Exception message.
-   * @param integer $code [recommended]  Exception code.
-   * @param \Exception $previous [optional] Previous exception.
-   */
-  public function __construct($message = NULL, $code = NULL,
-          \Exception $previous = NULL)
+  protected function format($causeMessage = NULL)
   {
-    $code = isset($code) ? $code : self::CODE;
-    $message = isset($message) ? 'Division by zero.' : $message;
-    parent::__construct($this->format($message), $code, $previous);
+    $message = 'No exchange rates defined ';
+    $causeMessage = \trim($causeMessage);
+    if (empty($causeMessage)):
+      $message .= '.';
+    else:
+      $message .= ', caused by: ' . $causeMessage;
+    endif;
+    return $message;
   }
-
 }
 

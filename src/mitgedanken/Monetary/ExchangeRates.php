@@ -32,12 +32,22 @@ class ExchangeRates implements ExchangeRatesInterface {
   protected $storage;
 
   /**
+   * [default: FALSE]
+   */
+  protected $noSuitableException;
+
+  /**
    * Constructor.
    *
    * @param \SplObjectStorage $storage
+   * @param boolean $noSuitableException
+   *        Set to <i>TRUE</i> to thow a <i>NoSuitableExchangeRate</i> exception
+   *        if no suitable exchange rate was found.
    */
-  public function __construct(\SplObjectStorage $storage = NULL)
+  public function __construct(\SplObjectStorage $storage = NULL,
+                              $noSuitableException = FALSE)
   {
+    $this->noSuitableException = $noSuitableException;
     if (isset($storage)):
       $this->storage = $storage;
     else:
@@ -45,38 +55,76 @@ class ExchangeRates implements ExchangeRatesInterface {
     endif;
   }
 
+  /**
+   * Set if a <i>NoSuitableExchangeRate</i> exception is thrown if no suitable
+   * exchange rate was found.
+   *
+   * @param boolean $boolean
+   */
+  public function setNoSuitableException($boolean)
+  {
+    $this->noSuitableException = $boolean;
+  }
+
+  /**
+   * Attaches a exchange rate.<br/>
+   * It is consisting of a <i>CurrencyPair</i> and a exchange rate.
+   *
+   * @param \mitgedanken\Monetary\CurrencyPairInterface $pair
+   * @param type $rate
+   */
   public function attach(CurrencyPairInterface $pair, $rate)
   {
     $this->storage->attach($pair, $rate);
   }
 
+  /**
+   * Dettaches a exchange rate.<br/>
+   *
+   * @param \mitgedanken\Monetary\CurrencyPairInterface $pair
+   */
   public function dettach(CurrencyPairInterface $pair)
   {
     $this->storage->detach($pair);
   }
 
+  /**
+   * Exchanges the given <i>Money</i> object to the given <i>Currency</i>.<br/>
+   * It throws a <i>NoSuitableExchangeRate</i> exception if this object has been
+   * set for it.
+   *
+   * @param \mitgedanken\Monetary\MoneyInterface $money
+   * @param \mitgedanken\Monetary\CurrencyInterface $toCurrency
+   * @return \mitgedanken\Monetary\Money
+   * @throws NoSuitableExchangeRate If this object has been set for it..
+   */
   public function exchange(MoneyInterface $money, CurrencyInterface $toCurrency)
   {
-    $result = 0;
+    $result = NULL;
     $fromCurrency = $money->getCurrency();
-    if ($fromCurrency->equals($toCurrency)):
-      $result = $money->getAmount();
+    $found = FALSE;
+    if (0 < $this->storage->count()):
+      $pair = new CurrencyPair($fromCurrency, $toCurrency);
+      $this->storage->rewind();
+      while (!$found && $this->storage->valid()):
+        $rates = $this->storage->getInfo();
+        $found = $this->storage->current()->equals($pair);
+        $this->storage->next();
+      endwhile;
+    endif;
+    if ($found):
+      $exchangeResult = $money->multiply($rates[1])->divide($rates[0]);
+      $result = new Money($exchangeResult->getAmount(), $toCurrency);
     else:
-      $found = FALSE;
-      if (0 < $this->storage->count()):
-        $pair = new CurrencyPair($fromCurrency, $toCurrency);
-        $this->storage->rewind();
-        while (!$found && $this->storage->valid()):
-          $rates = $this->storage->getInfo();
-          $found = $this->storage->current()->equals($pair);
-          $this->storage->next();
-          if ($found):
-            $result = $rates[1] * $money->getAmount() / $rates[0];
-          endif;
-        endwhile;
+      if ($this->noSuitableException):
+        throw new NoSuitableExchangeRate($money->getCurrency());
+      elseif ($fromCurrency->equals($toCurrency)):
+        $result = $money;
+      else:
+        $result = new Money(0, $toCurrency);
       endif;
     endif;
-    return new Money($result, $toCurrency);
+    return $result;
   }
 
   public function identify()

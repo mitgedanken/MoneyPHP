@@ -42,6 +42,17 @@ interface MoneyInterface {
   function getCurrency();
 
   /**
+   * Checks if this <i>Money</i> has the same amount as the other.
+   * <i>The objects must have the same currency.</i></p>
+   *
+   * @param \mitgedanken\Monetary\MoneyInterface $other
+   * @return boolean <b>TRUE</b> if this monetary value has
+   *                 the same amount and the same currency as the other;
+   *                 <b>FALSE</b> otherwise.
+   */
+  public function hasSameAmount(MoneyInterface $other);
+
+  /**
    * Checks if its currency is "equal to" the $currency argument.
    *
    * @param \mitgedanken\Monetary\MoneyInterface $other
@@ -52,18 +63,18 @@ interface MoneyInterface {
   function hasSameCurrency(MoneyInterface $currency);
 
   /**
-   * Return a new MoneyValue object that represents the monetary value
+   * Return a new <i>Money</i> object that represents the monetary value
    * of the sum of this Money object and another.
    *
    * @param \mitgedanken\Monetary\MoneyInterface $addend
    * @return \mitgedanken\Monetary\MoneyInterface
    * @throws InvalidArgumentException
-   * @throws DifferentCurrenciesException If $addend has a different currency.
+   * @throws DifferentCurrencies If $addend has a different currency.
    */
   function add(MoneyInterface $addend);
 
   /**
-   * Return a new MoneyValue object that represents the monetary value
+   * Return a new <i>Money</i> object that represents the monetary value
    * of the difference of this Money object and another.
    *
    * @param \mitgedanken\Monetary\MoneyInterface $subtrahend
@@ -73,33 +84,44 @@ interface MoneyInterface {
   function subtract(MoneyInterface $subtrahend);
 
   /**
-   * Return a new MoneyValue object that represents the monetary value
+   * Return a new <i>Money</i> object that represents the monetary value
    * of this Money object multiplied by a given factor.
    *
    * @see _multiplyAlgo
    * @param  float|integer $multiplier
+   * @param boolean $rounding [default: TRUE] rounds the result if </i>TRUE</i>
    * @return \mitgedanken\Monetary\MoneyInterface
    * @throws InvalidArgumentException
    */
-  function multiply($multiplier);
+  function multiply($multiplier, $rounding = TRUE);
 
   /**
-   * Return a new MoneyValue object that represents the monetary value
+   * Return a new <i>Money</i> object that represents the monetary value
    * of this Money object divided by a given divisor.
    *
-   * @see _divideAlgo
    * @param  integer|\mitgedanken\Monetary\MoneyInterface $divisor
+   * @param boolean $rounding [default: TRUE] rounds the result if </i>TRUE</i>
    * @return \mitgedanken\Monetary\MoneyInterface
    * @throws InvalidArgumentException
-   * @throws DivisionByZeroException
+   * @throws DivisionByZero
    */
-  function divide($divisor);
+  function divide($divisor, $rounding = TRUE);
 
   /**
-   * Compares this MoneyValue object to another with the same currency.
+   * Return a new Money object that represents the monetary value
+   * of this Money object, allocated according to a list of ratio's.
+   *
+   * @param array $ratios the ratio's.
+   * @param boolean $rounding [default: FALSE] rounds the result if </i>TRUE</i>
+   * @return \mitgedanken\Monetary\MoneyInterface[] the allocated monies.
+   */
+  public function allocate($ratios, $rounding = FALSE);
+
+  /**
+   * Compares this <i>Money</i> object to another with the same currency.
    * If both monetary values are zero, they currency must not be the same.
    *
-   * @param \mitgedanken\Monetary\MoneyInterface $other the other MoneyValue.
+   * @param \mitgedanken\Monetary\MoneyInterface $other the other <i>Money</i>.
    * @return integer  0 if they are equal,
    *                 -1 if the other amount is greater or
    *                  1 if the other amount is less.
@@ -108,7 +130,7 @@ interface MoneyInterface {
   function compare(MoneyInterface $other);
 
   /**
-   * Checks if this MoneyValue object is greater than the other.
+   * Checks if this <i>Money</i> object is greater than the other.
    *
    * @param \mitgedanken\Monetary\MoneyInterface $other
    * @return boolean <b>TRUE</b> if the value is greater than the other;
@@ -118,7 +140,7 @@ interface MoneyInterface {
   function greaterThan(MoneyInterface $other);
 
   /**
-   * Checks if this MoneyValue object is less than the other.
+   * Checks if this <i>Money</i> object is less than the other.
    *
    * @param \mitgedanken\Monetary\MoneyInterface $other
    * @return boolean <b>TRUE</b> if the value is less than the other.

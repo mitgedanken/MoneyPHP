@@ -1,21 +1,25 @@
 {
-  "name": "mitgedanken/monetary/moneyphp",
-  "description": "A monetary value object based on Money by Martin Fowler.",
-  "version": "13.22.0-alpha",
+  "name": "mitgedanken/saschatasche/moneyphp",
+  "description": "A PHP implementation of a monetary value object based on Money by Martin Fowler.",
+  "type": "library",
+  "license": "GPL-3",
   "authors": [
     {
       "name": "Sascha Tasche",
       "email": "sascha@mitgedanken.de"
     }
   ],
-  "require": {
-  },
-  "php": ">=5.4.0",
-  "version": "1.0.0",
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "https://github.com/mitgedanken/MoneyPHP"
-    }
+  "version": "13.22.1-alpha",
+  "homepage": "",
+  "keywords": [
+    "money",
+    "monetary",
+    "currency",
+    "pattern",
+    "Martin Fowler"
   ],
+  "minimum-stability": "dev",
+  "require": {
+    "php": ">=5.4.0"
+  }
 }

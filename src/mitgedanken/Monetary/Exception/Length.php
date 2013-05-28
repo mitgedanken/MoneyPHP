@@ -20,29 +20,22 @@
 namespace mitgedanken\Monetary\Exception;
 
 /**
- * UnsupportedOpertationException
+ * Exception thrown if a length is invalid.
  *
  * @author Sascha Tasche <sascha@mitgedanken.de>
  */
-class UnsupportedOperationException extends Exception {
+class Length extends LogicException {
+
   /**
    * Exception code.
    */
-  const CODE = 405;
+  const CODE = 1410;
 
-  /**
-   * Construct this exception. 
-   *
-   * @param string $message [recommended] Exception message.
-   * @param integer $code [recommended] Exception code.
-   * @param \Exception $previous [optional] Previous exception.
-   */
-  public function __construct($message = NULL, $code = NULL,
-          \Exception $previous = NULL)
+  protected function format($causeMessage = NULL)
   {
-    $code    = isset($code) ? $code : self::CODE;
-    $message = isset($message) ? 'Unsupported operation.' : $message;
-    parent::__construct($this->format($message), $code, $previous);
+    $message = 'Invalid length,';
+    $message .= ' caused by: ' . \trim($causeMessage);
+    return $message;
   }
-
 }
+

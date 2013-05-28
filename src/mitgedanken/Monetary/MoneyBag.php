@@ -18,7 +18,9 @@
  */
 
 namespace mitgedanken\Monetary;
-use mitgedanken\Monetary\Exception\UnsupportedOperationException;
+use mitgedanken\Monetary\Exception\UnsupportedOperation,
+    mitgedanken\Monetary\Exception\DifferentCurrencies,
+    mitgedanken\Monetary\Exception\NoExchangeRatesDefined;
 
 /**
  * <i>Immutable</i><br/>
@@ -104,20 +106,6 @@ class MoneyBag extends Money implements MoneyBagInterface {
     return $this->addMoney($money);
   }
 
-  /**
-   * <i>Override</i>
-   * It throws a <i>DifferentCurrenciesException</i> only if it is used in
-   * compat mode. If compat mode is used, it will throw a <i>DifferentCurrenciesException</i>
-   * if <b>$addend</b> has a different currency.
-   *
-   * @param \mitgedanken\Monetary\MoneyInterface $addend
-   * @param bool $compatMode [default: FALSE] <i>TRUE</i> to using compat mode.
-   * @return \mitgedanken\Monetary\MoneyInterface
-   * @throws UnsupportedOperationException
-   *    If $addend is not an instance of <i>MoneyBagInterface</i> or <i>MoneyInterface</i>.
-   * @throws DifferentCurrenciesException
-   *    If $compatMode is <i>TRUE</i> and if $addend has a different currency.
-   */
   public function add(MoneyInterface $addend, $compatMode = FALSE)
   {
     if ($compatMode):
@@ -132,13 +120,29 @@ class MoneyBag extends Money implements MoneyBagInterface {
       $message = 'Unsupported object type;
         expected: MoneyInterface or MoneyBagInterface, but was: '
               . \gettype($addend);
-      throw new UnsupportedOperationException($message);
+      throw new UnsupportedOperation($message);
     endif;
     return $result;
   }
 
+  public function subtract(MoneyInterface $subtrahend)
+  {
+    $object = $this->_findByMoney($subtrahend);
+    if (!\is_object($object)):
+      throw new DifferentCurrencies($subtrahend);
+    endif;
+    $newObject = $object->subtract($subtrahend);
+    $this->storage->attach($newObject);
+    $this->storage->detach($object);
+    return $newObject;
+  }
+
   public function getMoneyIn(CurrencyInterface $toCurrency)
   {
+    if (is_null($this->exchangeRates)):
+      throw new NoExchangeRatesDefined();
+    endif;
+
     $exchanged = NULL;
     $this->storage->rewind();
     while ($this->storage->valid()):
@@ -170,9 +174,19 @@ class MoneyBag extends Money implements MoneyBagInterface {
     return $total;
   }
 
-  public function amountToTotal()
+  public function toTotalAmount()
   {
-    $this->amount = $this->getTotalIn($this->currency);
+    $this->amount = $this->getMoneyIn($this->currency)->amount;
+  }
+
+  public function deleteMoney(MoneyInterface $delete, $onlybyCurrency = FALSE)
+  {
+    if ($onlybyCurrency):
+      $deleteByCurrency = $this->_findByCurrency($delete->getCurrency());
+      $this->storage->detach($deleteByCurrency);
+    else:
+      $this->storage->detach($delete);
+    endif;
   }
 
   public function replaceExchangeRates(ExchangeRatesInterface $exchangeRates)
