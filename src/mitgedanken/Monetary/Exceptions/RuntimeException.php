@@ -31,7 +31,7 @@ class RuntimeException extends Exception {
   protected function format($causeMessage = NULL)
   {
     $message = 'RuntimeException, ';
-    $message .= ' caused by: ' . \trim($causeMessage);
+    $message .= ' reason: ' . \trim($causeMessage);
     return $message;
   }
 }

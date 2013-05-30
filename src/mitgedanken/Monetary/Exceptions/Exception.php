@@ -54,7 +54,7 @@ class Exception extends \Exception implements MonetaryException {
   protected function format($causeMessage = NULL)
   {
     $message = 'A monetary exception, ';
-    $message .= ' caused by: ' . \trim($causeMessage);
+    $message .= ' reason: ' . \trim($causeMessage);
     return $message;
   }
 }

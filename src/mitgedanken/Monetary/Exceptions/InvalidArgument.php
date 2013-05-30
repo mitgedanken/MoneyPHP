@@ -39,7 +39,7 @@ class InvalidArgument extends LogicException {
   protected function format($causeMessage = NULL)
   {
     $message = 'Invalid argument,';
-    $message .= ' caused by: ' . \trim($causeMessage);
+    $message .= ' reason: ' . \trim($causeMessage);
     return $message;
   }
 }

@@ -34,7 +34,7 @@ class UnsupportedOperation extends Exception {
   protected function format($causeMessage = NULL)
   {
     $message = 'Unsupported operation,';
-    $message .= ' caused by: ' . \trim($causeMessage);
+    $message .= ' reason: ' . \trim($causeMessage);
     return $message;
   }
 }

@@ -29,7 +29,7 @@ class NoSuitableExchangeRate extends RuntimeException {
   protected function format($causeMessage = NULL)
   {
     $message = 'No suitable exchange rate found, ';
-    $message .= ' caused by: ' . \trim($causeMessage);
+    $message .= ' reason: ' . \trim($causeMessage);
     return $message;
   }
 }

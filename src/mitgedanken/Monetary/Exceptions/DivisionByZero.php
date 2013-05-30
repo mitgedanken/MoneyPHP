@@ -33,7 +33,7 @@ class DivisionByZero extends InvalidArgument {
     if (empty($causeMessage)):
       $message .= '.';
     else:
-      $message .= ', caused by: ' . \trim($causeMessage);
+      $message .= ', reason: ' . \trim($causeMessage);
     endif;
     return $message;
   }

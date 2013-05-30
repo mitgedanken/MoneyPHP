@@ -33,7 +33,7 @@ class NoExchangeRatesDefined extends RuntimeException {
     if (empty($causeMessage)):
       $message .= '.';
     else:
-      $message .= ', caused by: ' . $causeMessage;
+      $message .= ', reason: ' . $causeMessage;
     endif;
     return $message;
   }

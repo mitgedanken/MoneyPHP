@@ -43,7 +43,7 @@ class DifferentCurrencies extends LogicException {
     if (empty($causeMessage)):
       $message .= '.';
     else:
-      $message .= ', caused by: ' . \trim($causeMessage);
+      $message .= ', reason: ' . \trim($causeMessage);
     endif;
     return $message;
   }
