@@ -17,52 +17,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace mitgedanken\Monetary;
+namespace mitgedanken\Monetary\Exceptions;
 
 /**
- * NullObject for ICurrency.
+ * DifferentCurrencies.
+ *
+ * @author Sascha Tasche <sascha@mitgedanken.de>
  */
-class NullCurrency extends Currency {
+class DifferentCurrencies extends LogicException {
 
   /**
-   * <i>Override</i>
+   * Exception code.
    */
-  public function __construct($code = '', $name = '')
-  {
-
-  }
+  const CODE = 1401;
 
   /**
-   * <i>Override</i>
+   * Formats the message string for this exception.
    *
-   * @param string $name [unused]
-   * @param array $arguments [unused]
-   * @return \mitgedanken\Monetary\NullCurrency
+   * @param string $causeMessage
    */
-  public static function __callStatic($name = NULL, $arguments = NULL)
+  protected function format($causeMessage = NULL)
   {
-    return new NullCurrency();
+    $message = 'Different currencies';
+    $causeMessage = \trim($causeMessage);
+    if (empty($causeMessage)):
+      $message .= '.';
+    else:
+      $message .= ', caused by: ' . \trim($causeMessage);
+    endif;
+    return $message;
   }
-
-  /** <i>Override</i> */
-  public function getCode()
-  {
-    return NULL;
-  }
-
-  /** <i>Override</i> */
-  public function getName()
-  {
-    return NULL;
-  }
-
-  /** <i>Override</i>
-   *
-   * @param mixed $object
-   */
-  public function equals($object)
-  {
-    return ($object instanceof Currency);
-  }
-
 }

@@ -24,36 +24,35 @@ namespace mitgedanken\Monetary;
  *
  * @author Sascha Tasche <sascha@mitgedanken.de>
  */
-class CurrencyPair implements CurrencyPairInterface {
+class CurrencyPair implements Interfaces\CurrencyPair {
 
   /**
    * Its base currency.
    *
-   * @var \mitgedanken\Monetary\CurrencyInterface
+   * @var \mitgedanken\Monetary\Interfaces\Currency
    */
   protected $baseCurrency;
 
   /**
    * Its counter currency.
    *
-   * @var \mitgedanken\Monetary\CurrencyInterface
+   * @var \mitgedanken\Monetary\Interfaces\Currency
    */
   protected $counterCurrency;
 
   /**
    * Constructs this currency pair with a base currency and a counter currency.
    *
-   * @param \mitgedanken\Monetary\CurrencyInterface $baseCurrency
-   * @param \mitgedanken\Monetary\CurrencyInterface $counterCurrency
+   * @param \mitgedanken\Monetary\Interfaces\Currency $baseCurrency
+   * @param \mitgedanken\Monetary\Interfaces\Currency $counterCurrency
    */
-  public function __construct(CurrencyInterface $baseCurrency,
-                              CurrencyInterface $counterCurrency)
+  public function __construct(Currency $baseCurrency, Currency $counterCurrency)
   {
     $this->baseCurrency = $baseCurrency;
     $this->counterCurrency = $counterCurrency;
   }
 
-  public function has(CurrencyInterface $currency)
+  public function has(Interfaces\Currency $currency)
   {
     return $this->baseCurrency->equals($currency)
             || $this->counterCurrency->equals($currency);
@@ -62,7 +61,7 @@ class CurrencyPair implements CurrencyPairInterface {
   public function equals($object)
   {
     $isEqual = FALSE;
-    if ($object instanceof CurrencyPairInterface):
+    if ($object instanceof CurrencyPair):
       $isEqual = ($this->baseCurrency->equals($object->baseCurrency)
               || $this->baseCurrency->equals($object->counterCurrency))
               && ($this->counterCurrency->equals($object->counterCurrency)

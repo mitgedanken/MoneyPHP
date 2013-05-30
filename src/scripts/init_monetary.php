@@ -6,8 +6,9 @@ endif;
 if (!defined('MODULE_AUTOLOAD')):
 // Autoloader (source: https://gist.github.com/adriengibrat/4761717#comment-773452)
   set_include_path(get_include_path() . PATH_SEPARATOR . ROOT);
-  spl_autoload_register(function($c) {
-            @include preg_replace('#\\\|_(?!.*\\\)#', '/', $c) . '.php';
+  spl_autoload_register(function($c)
+          {
+            include preg_replace('#\\\|_(?!.*\\\)#', '/', $c) . '.php';
           });
 endif;
 
@@ -16,7 +17,7 @@ return array(
     'name' => 'MoneyPHP',
     'id' => 'mitgedanken/monetary/moneyphp',
     'desc' => 'A monetary value object based on Money by Martin Fowler.',
-    'version' => '13.22.1-alpha',
+    'version' => '13.22.2-alpha',
     'require' => array(),
     'forks' => '',
     'php' => '>=5.4.0',

@@ -1,7 +1,5 @@
 <?php
 
-//
-
 namespace mitgedanken\Monetary;
 use PHPUnit_Framework_TestCase;
 use mitgedanken\Monetary\Money,
@@ -150,17 +148,6 @@ class MoneyTest extends PHPUnit_Framework_TestCase {
 
   /**
    * @test
-   * @covers mitgedanken\Monetary\Money::add
-   * @expectedException \mitgedanken\Monetary\Exception\DifferentCurrencies
-   */
-  public function addDifferentCurrencies()
-  {
-    $other = new Money(1, new Currency('USD'));
-    $this->eur->add($other);
-  }
-
-  /**
-   * @test
    * @covers mitgedanken\Monetary\Money::subtract
    */
   public function subtract()
@@ -169,17 +156,6 @@ class MoneyTest extends PHPUnit_Framework_TestCase {
     $other = new Money(1, $currency);
     $expected = new Money($this->amount - 1, $currency);
     $this->assertEquals($expected, $this->eur->subtract($other));
-  }
-
-  /**
-   * @test
-   * @covers mitgedanken\Monetary\Money::subtract
-   * @expectedException \mitgedanken\Monetary\Exception\DifferentCurrencies
-   */
-  public function subtractDifferentCurrencies()
-  {
-    $other = new Money(1, new Currency('USD'));
-    $this->eur->subtract($other);
   }
 
   /**
@@ -205,32 +181,12 @@ class MoneyTest extends PHPUnit_Framework_TestCase {
 
   /**
    * @test
-   * @covers mitgedanken\Monetary\Money::multiply
-   * @expectedException \mitgedanken\Monetary\Exception\DifferentCurrencies
-   */
-  public function multiplyDifferentCurrencies()
-  {
-    $this->eur->multiply($this->usd);
-  }
-
-  /**
-   * @test
    * @covers mitgedanken\Monetary\Money::divide
    */
   public function divide()
   {
     $expected = new Money(1, new Currency('EUR'));
     $this->assertEquals($expected, $this->eur->divide($this->amount));
-  }
-
-  /**
-   * @test
-   * @covers mitgedanken\Monetary\Money::divide
-   * @expectedException mitgedanken\Monetary\Exception\DivisionByZero
-   */
-  public function divisionByZero()
-  {
-    $this->eur->divide(0);
   }
 
   /**
@@ -253,16 +209,6 @@ class MoneyTest extends PHPUnit_Framework_TestCase {
 
   /**
    * @test
-   * @covers mitgedanken\Monetary\Money::compare
-   * @expectedException mitgedanken\Monetary\Exception\DifferentCurrencies
-   */
-  public function compareException()
-  {
-    $this->eur->compare($this->usd);
-  }
-
-  /**
-   * @test
    * @depends compare
    * @covers mitgedanken\Monetary\Money::greaterThan
    */
@@ -271,18 +217,6 @@ class MoneyTest extends PHPUnit_Framework_TestCase {
     $other = new Money($this->amount + 10, new Currency('EUR'));
     $this->assertTrue($other->greaterThan($this->eur));
     $this->assertFalse($this->eur->greaterThan($other));
-  }
-
-  /**
-   * @test If they currencies are unequal, an exception must be thrown.
-   * @depends compareException
-   * @covers mitgedanken\Monetary\Money::greaterThan
-   * @expectedException mitgedanken\Monetary\Exception\DifferentCurrencies
-   */
-  public function greaterThanDifferentCurrencies()
-  {
-    $other = new Money($this->amount + 10, new Currency('EUR'));
-    $other->greaterThan($this->usd);
   }
 
   /**
@@ -295,18 +229,6 @@ class MoneyTest extends PHPUnit_Framework_TestCase {
     $other = new Money($this->amount + 10, new Currency('EUR'));
     $this->assertTrue($this->eur->lessThan($other));
     $this->assertFalse($other->lessThan($this->eur));
-  }
-
-  /**
-   * @test If they currencies are unequal, an exception must be thrown.
-   * @depends compareException
-   * @covers mitgedanken\Monetary\Money::lessThan
-   * @expectedException mitgedanken\Monetary\Exception\DifferentCurrencies
-   */
-  public function lessThanException()
-  {
-    $other = new Money($this->amount + 10, new Currency('EUR'));
-    $other->lessThan($this->usd);
   }
 
   /**

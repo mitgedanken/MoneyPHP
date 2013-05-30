@@ -18,9 +18,9 @@
  */
 
 namespace mitgedanken\Monetary;
-use mitgedanken\Monetary\Exception\UnsupportedOperation,
-    mitgedanken\Monetary\Exception\DifferentCurrencies,
-    mitgedanken\Monetary\Exception\NoExchangeRatesDefined;
+use mitgedanken\Monetary\Exceptions\UnsupportedOperation,
+    mitgedanken\Monetary\Exceptions\DifferentCurrencies,
+    mitgedanken\Monetary\Exceptions\NoExchangeRatesDefined;
 
 /**
  * <i>Immutable</i><br/>
@@ -34,12 +34,12 @@ use mitgedanken\Monetary\Exception\UnsupportedOperation,
  *
  * @author Sascha Tasche <sascha@mitgedanken.de>
  */
-class MoneyBag extends Money implements MoneyBagInterface {
+class MoneyBag extends Money implements Interfaces\MoneyBag, \Countable {
 
   /**
    * Exchange rates.
    */
-  protected $exchangeRates;
+  protected $moneyConverter;
 
   /**
    * Storage for all Money and MoneyBag objects.
@@ -54,14 +54,14 @@ class MoneyBag extends Money implements MoneyBagInterface {
    * If <i>$storage</i> is <i>NULL</i> it will instaniate an empty <i>MonetaryStorage</i>.
    *
    * @param integer|float $amount
-   * @param \mitgedanken\Monetary\CurrencyInterface $defaultCurrency
-   * @param \mitgedanken\Monetary\ExchangeRates $rates [default: NULL]
-   * @param \mitgedanken\Monetary\MonetaryStorage $storage [default: NULL]
+   * @param \mitgedanken\Monetary\Interfaces\Currency $defaultCurrency
+   * @param \mitgedanken\Monetary\Interfaces\MoneyConverter $rates [default: NULL]
+   * @param \mitgedanken\Monetary\Interfaces\MonetaryStorage $storage [default: NULL]
    *
    * @param \SplObjectStorage $storage [nullable]
    */
-  public function __construct($amount, CurrencyInterface $defaultCurrency,
-                              ExchangeRatesInterface $rates = NULL,
+  public function __construct($amount, Interfaces\Currency $defaultCurrency,
+                              Interfaces\MoneyConverter $rates = NULL,
                               \SplObjectStorage $storage = NULL)
   {
     parent::__construct($amount, $defaultCurrency);
@@ -73,13 +73,13 @@ class MoneyBag extends Money implements MoneyBagInterface {
     $this->storage->attach($defaultMoney);
 
     if (isset($rates)):
-      $this->exchangeRates = $rates;
+      $this->moneyConverter = $rates;
     else:
-      $this->exchangeRates = new ExchangeRates();
+      $this->moneyConverter = new MoneyConverter();
     endif;
   }
 
-  public function addMoney(MoneyInterface $addendMoney)
+  public function addMoney(Interfaces\Money $addendMoney)
   {
     $found = $this->_findByMoney($addendMoney);
     if (\is_object($found)):
@@ -99,22 +99,22 @@ class MoneyBag extends Money implements MoneyBagInterface {
     return $result;
   }
 
-  public function addMoneyBag(MoneyBagInterface $addendMoneyBag)
+  public function addMoneyBag(Interfaces\MoneyBag $addendMoneyBag)
   {
     /* Converting MoneyBag to Money */
     $money = new Money($addendMoneyBag->amount, $addendMoneyBag->currency);
     return $this->addMoney($money);
   }
 
-  public function add(MoneyInterface $addend, $compatMode = FALSE)
+  public function add(Interfaces\Money $addend, $compatMode = FALSE)
   {
     if ($compatMode):
       parent::_requiresSameCurrency($addend->getCurrency(), __METHOD__);
     endif;
 
-    if ($addend instanceof MoneyBagInterface):
+    if ($addend instanceof Interfaces\MoneyBag):
       $result = $this->addMoneyBag($addend);
-    elseif ($addend instanceof MoneyInterface):
+    elseif ($addend instanceof Money):
       $result = $this->addMoney($addend);
     else:
       $message = 'Unsupported object type;
@@ -125,7 +125,7 @@ class MoneyBag extends Money implements MoneyBagInterface {
     return $result;
   }
 
-  public function subtract(MoneyInterface $subtrahend)
+  public function subtract(Interfaces\Money $subtrahend)
   {
     $object = $this->_findByMoney($subtrahend);
     if (!\is_object($object)):
@@ -137,33 +137,31 @@ class MoneyBag extends Money implements MoneyBagInterface {
     return $newObject;
   }
 
-  public function getMoneyIn(CurrencyInterface $toCurrency)
+  public function getMoneyIn(Interfaces\Currency $toCurrency)
   {
-    if (is_null($this->exchangeRates)):
+    if (is_null($this->moneyConverter)):
       throw new NoExchangeRatesDefined();
     endif;
 
     $exchanged = NULL;
-    $this->storage->rewind();
-    while ($this->storage->valid()):
-      $current = $this->storage->current();
-      $exchangeRes = $this->exchangeRates->exchange($current, $toCurrency);
+    foreach ($this->storage as $value):
+      $current = $value;
+      $exchangeRes = $this->moneyConverter->convert($current, $toCurrency);
       if (is_object($exchanged)):
         $exchanged = $exchangeRes->add($exchanged);
       else:
         $exchanged = $exchangeRes;
       endif;
-      $this->storage->next();
-    endwhile;
+    endforeach;
     return $exchanged;
   }
 
-  public function getTotalIn(CurrencyInterface $inCurrency)
+  public function getTotalIn(Interfaces\Currency $inCurrency)
   {
     return $this->getMoneyIn($inCurrency)->amount;
   }
 
-  public function getTotalOf(CurrencyInterface $inCurrency)
+  public function getTotalOf(Interfaces\Currency $inCurrency)
   {
     $total = 0;
     if ($this->currency->equals($inCurrency)):
@@ -179,7 +177,7 @@ class MoneyBag extends Money implements MoneyBagInterface {
     $this->amount = $this->getMoneyIn($this->currency)->amount;
   }
 
-  public function deleteMoney(MoneyInterface $delete, $onlybyCurrency = FALSE)
+  public function deleteMoney(Interfaces\Money $delete, $onlybyCurrency = FALSE)
   {
     if ($onlybyCurrency):
       $deleteByCurrency = $this->_findByCurrency($delete->getCurrency());
@@ -189,9 +187,51 @@ class MoneyBag extends Money implements MoneyBagInterface {
     endif;
   }
 
-  public function replaceExchangeRates(ExchangeRatesInterface $exchangeRates)
+  public function replaceConverter(Interfaces\MoneyConverter $converter)
   {
-    $this->exchangeRates = $exchangeRates;
+    $this->moneyConverter = $converter;
+  }
+
+  public function allocate($ratios, $rounding = FALSE)
+  {
+    if (isset(static::$allocate_algo)):
+      $result =
+              \call_user_func(
+              static::$allocate_algo, $this->amount, $ratios, $rounding);
+    else:
+      $result = $this->_allocateAlgo($ratios, $rounding);
+    endif;
+    return $result;
+  }
+
+  /**
+   * <i>Alogrithm</i></p>
+   * Return a new Money object that represents the monetary value
+   * of this Money object, allocated according to a list of ratio's.
+   *
+   * @param array $ratios
+   * @param boolean $rounding [default: FALSE] rounds the result if </i>TRUE</i>
+   * @return array \mitgedanken\Monetary\SimpleMoney
+   */
+  private function _allocateAlgo(array $ratios, $rounding = FALSE)
+  {
+    $countRatios = count($ratios);
+    $total = array_sum($ratios);
+    $remainder = $this->amount;
+    $results = new \SplFixedArray($countRatios);
+
+    for ($i = 0; $i < $countRatios; $i += 1):
+      $mulresult = $this->_multiplyAlgo($this->amount, $ratios[$i]);
+      $result = $this->_divideAlgo($mulresult, $total, $rounding);
+      $results[$i] = $this->_newMoney($result);
+      $remainder -= $results[$i]->amount;
+    endfor;
+
+    for ($i = 0; $i < $remainder; $i++):
+      $results[$i]->amount++;
+    endfor;
+
+    return $results;
   }
 
   public function count()
@@ -202,8 +242,8 @@ class MoneyBag extends Money implements MoneyBagInterface {
   /**
    * Return the money with the same currency.
    *
-   * @param \mitgedanken\Monetary\MoneyInterface $money
-   * @return \mitgedanken\Monetary\MoneyInterface Money with the same currency as $money.
+   * @param \mitgedanken\Monetary\Interfaces\Money $money
+   * @return \mitgedanken\Monetary\Interfaces\Money Money with the same currency as $money.
    */
   protected function _findByMoney($money)
   {
@@ -221,10 +261,10 @@ class MoneyBag extends Money implements MoneyBagInterface {
   /**
    * Return the money with the same currency.
    *
-   * @param \mitgedanken\Monetary\CurrencyInterface $currency
-   * @return \mitgedanken\Monetary\MoneyInterface Money with the same currency as $money.
+   * @param \mitgedanken\Monetary\Interfaces\Currency $currency
+   * @return \mitgedanken\Monetary\Interfaces\Money Money with the same currency as $money.
    */
-  protected function _findByCurrency(CurrencyInterface $currency)
+  protected function _findByCurrency(Interfaces\Currency $currency)
   {
     $current = NULL;
     $found = FALSE;

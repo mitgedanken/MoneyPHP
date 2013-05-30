@@ -17,24 +17,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace mitgedanken\Monetary\Exception;
+namespace mitgedanken\Monetary\Exceptions;
 
 /**
- * UnsupportedOpertation
+ * Exception thrown if a length is invalid.
  *
  * @author Sascha Tasche <sascha@mitgedanken.de>
  */
-class UnsupportedOperation extends Exception {
+class Length extends LogicException {
 
   /**
    * Exception code.
    */
-  const CODE = 405;
+  const CODE = 1410;
 
   protected function format($causeMessage = NULL)
   {
-    $message = 'Unsupported operation,';
+    $message = 'Invalid length,';
     $message .= ' caused by: ' . \trim($causeMessage);
     return $message;
   }
 }
+

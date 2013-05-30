@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace mitgedanken\Monetary\Exception;
+namespace mitgedanken\Monetary\Exceptions;
 
 /**
  * A monetary exception.

@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace mitgedanken\Monetary;
+namespace mitgedanken\Monetary\Interfaces;
 
 /**
  * <i>Immutable</i><br/>
@@ -26,7 +26,7 @@ namespace mitgedanken\Monetary;
  *
  * @author Sascha Tasche <sascha@mitgedanken.de>
  */
-interface MoneyBagInterface extends MoneyInterface {
+interface MoneyBag extends Money {
 
   /**
    * <i>Override</i>
@@ -34,33 +34,33 @@ interface MoneyBagInterface extends MoneyInterface {
    * compat mode. If compat mode is used, it will throw a <i>DifferentCurrencies</i>
    * if <b>$addend</b> has a different currency.
    *
-   * @param \mitgedanken\Monetary\MoneyInterface $addend
+   * @param \mitgedanken\Monetary\Interfaces\Money $addend
    * @param bool $compatMode [default: FALSE] <i>TRUE</i> to using compat mode.
-   * @return \mitgedanken\Monetary\MoneyInterface
+   * @return \mitgedanken\Monetary\Interfaces\Money
    * @throws UnsupportedOperationException
    *    If $addend is not an instance of <i>MoneyBagInterface</i> or <i>MoneyInterface</i>.
    * @throws DifferentCurrencies
    *    If $compatMode is <i>TRUE</i> and if $addend has a different currency.
    */
-  function add(MoneyInterface $addend, $compatMode = FALSE);
+  function add(Money $addend, $compatMode = FALSE);
 
   /**
    * Adds a <i>Money</i> object to this MoneyBag.
-   * @see \mitgedanken\Monetary\MoneyInterface::add
+   * @see \mitgedanken\Monetary\Interfaces\Money::add
    *
-   * @param \mitgedanken\Monetary\MoneyInterface $money
-   * @return \mitgedanken\Monetary\MoneyInterface
+   * @param \mitgedanken\Monetary\Interfaces\Money $money
+   * @return \mitgedanken\Monetary\Interfaces\Money
    */
-  function addMoney(MoneyInterface $addendMoney);
+  function addMoney(Money $addendMoney);
 
   /**
    * Adds a MoneyBag object to this MoneyBag.
-   * @see \mitgedanken\Monetary\MoneyInterface::add
+   * @see \mitgedanken\Monetary\Interfaces\Money::add
    *
-   * @param \mitgedanken\Monetary\MoneyBagInterface $moneyBag
-   * @return \mitgedanken\Monetary\MoneyInterface
+   * @param \mitgedanken\Monetary\Interfaces\MoneyBagInterface $moneyBag
+   * @return \mitgedanken\Monetary\Interfaces\Money
    */
-  function addMoneyBag(MoneyBagInterface $addendMoneyBag);
+  function addMoneyBag(MoneyBag $addendMoneyBag);
 
   /**
    * Return a <i>Money</i> object which total is a conversation of all monetary
@@ -68,27 +68,27 @@ interface MoneyBagInterface extends MoneyInterface {
    * <i>ExchangeRate</i> object. It returns a <i>Money</i> object with amount
    * of 0 if no suitable exchange rate was found.
    *
-   * @param \mitgedanken\Monetary\CurrencyInterface $currency
-   * @return \mitgedanken\Monetary\MoneyInterface
+   * @param \mitgedanken\Monetary\Interfaces\Currency $currency
+   * @return \mitgedanken\Monetary\Interfaces\Money
    */
-  function getMoneyIn(CurrencyInterface $desiredCurrency);
+  function getMoneyIn(Currency $desiredCurrency);
 
   /**
    * Return a <i>Money</i> object with total amount of this <i>MoneyBag</i>
    * object which is converted to the desired currency.
    *
-   * @param \mitgedanken\Monetary\CurrencyInterface $currency
-   * @return \mitgedanken\Monetary\MoneyInterface Money with the total amount.
+   * @param \mitgedanken\Monetary\Interfaces\Currency $currency
+   * @return \mitgedanken\Monetary\Interfaces\Money Money with the total amount.
    */
-  function getTotalIn(CurrencyInterface $desiredCurrency);
+  function getTotalIn(Currency $desiredCurrency);
 
   /**
    * Return its total amount in the desired currency.
    *
-   * @param \mitgedanken\Monetary\CurrencyInterface $currencys
+   * @param \mitgedanken\Monetary\Interfaces\Currency $currencys
    * @return integer|float Its total amount.
    */
-  function getTotalOf(CurrencyInterface $desiredCurrency);
+  function getTotalOf(Currency $desiredCurrency);
 
   /**
    * Sets the amount of this MoneyBag to its total.
@@ -101,11 +101,29 @@ interface MoneyBagInterface extends MoneyInterface {
    * <i>Changes its state</i><br/>
    * Deletes a money from the storage.
    *
-   * @param \mitgedanken\Monetary\MoneyInterface $delete
+   * @param \mitgedanken\Monetary\Interfaces\Money $delete
    * @param type $onlybyCurrency Set to <i>TRUE</i> if the deletion should be
    *        performed only via currency of $delete.
    */
-  function deleteMoney(MoneyInterface $delete, $onlybyCurrency = FALSE);
+  function deleteMoney(Money $delete, $onlybyCurrency = FALSE);
+
+  /**
+   * Replaces the <i>MoneyConverter</i> object of this MoneyBag.
+   *
+   * @param \mitgedanken\Monetary\MoneyConverter $moneyConverter
+   * @return void No return value.
+   */
+  function replaceConverter(MoneyConverter $moneyConverter);
+
+  /**
+   * Return a new Money object that represents the monetary value
+   * of this Money object, allocated according to a list of ratio's.
+   *
+   * @param array $ratios the ratio's.
+   * @param boolean $rounding [default: FALSE] rounds the result if </i>TRUE</i>
+   * @return \mitgedanken\Monetary\Interfaces\Money[] the allocated monies.
+   */
+  public function allocate($ratios, $rounding = FALSE);
 
   /**
    * Return count of all monies.
@@ -113,13 +131,6 @@ interface MoneyBagInterface extends MoneyInterface {
    * @return integer Count of all monies.
    */
   function count();
-
-  /**
-   * Replaces the ExchangeRates object of this MoneyBag.
-   *
-   * @return void No return value.
-   */
-  function replaceExchangeRates(ExchangeRatesInterface $exchangeRates);
 
   /**
    * <i>Override</i>

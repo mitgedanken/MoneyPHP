@@ -17,29 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace mitgedanken\Monetary\Exception;
+namespace mitgedanken\Monetary\Exceptions;
 
 /**
- * FunctionNotCallable.
+ * A marker interface for this package.
  *
  * @author Sascha Tasche <sascha@mitgedanken.de>
  */
-class FunctionNotCallable extends BadFunctionCall {
+interface MonetaryException {
 
-  /**
-   * Exception code.
-   */
-  const CODE = 1404;
-
-  /**
-   * Formats the message String for this Exception.
-   *
-   * @param string $function
-   */
-  public static function format($function, $causeMessage = NULL)
-  {
-    $message = "Function $function is not callable,";
-    $message .= ' caused by: ' . \trim($causeMessage);
-    return $message;
-  }
+  /* Marker interface */
 }

@@ -17,13 +17,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace mitgedanken\Monetary\Exception;
+namespace mitgedanken\Monetary\Exceptions;
 
 /**
- * A marker interface for this package.
+ * UnsupportedOpertation
  *
  * @author Sascha Tasche <sascha@mitgedanken.de>
  */
-interface MonetaryException {
-  /* Marker interface */
+class UnsupportedOperation extends Exception {
+
+  /**
+   * Exception code.
+   */
+  const CODE = 405;
+
+  protected function format($causeMessage = NULL)
+  {
+    $message = 'Unsupported operation,';
+    $message .= ' caused by: ' . \trim($causeMessage);
+    return $message;
+  }
 }

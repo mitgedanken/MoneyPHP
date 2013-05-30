@@ -17,24 +17,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace mitgedanken\Monetary\Exception;
+namespace mitgedanken\Monetary\Exceptions;
 
-class DivisionByZero extends InvalidArgument {
+/**
+ * InvalidArgumentException.
+ *
+ * @author Sascha Tasche <sascha@mitgedanken.de>
+ */
+class InvalidArgument extends LogicException {
+
   /**
    * Exception code.
    */
+  const CODE = 1400;
 
-  const CODE = 1418;
-
+  /**
+   * Formats the message string for this exception.
+   *
+   * @param string $causeMessage
+   */
   protected function format($causeMessage = NULL)
   {
-    $message = 'Division by zero';
-    $causeMessage = \trim($causeMessage);
-    if (empty($causeMessage)):
-      $message .= '.';
-    else:
-      $message .= ', caused by: ' . \trim($causeMessage);
-    endif;
+    $message = 'Invalid argument,';
+    $message .= ' caused by: ' . \trim($causeMessage);
     return $message;
   }
 }

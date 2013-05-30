@@ -17,15 +17,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace mitgedanken\Monetary\Exception;
+namespace mitgedanken\Monetary\Exceptions;
 
-/** TODO
- * BadFunctionCallException.
+/**
+ * Description of NoSuitableExchangeRate
  *
  * @author Sascha Tasche <sascha@mitgedanken.de>
  */
-class BadFunctionCall extends LogicException {
+class NoSuitableExchangeRate extends RuntimeException {
 
-  const CODE = 1001;
-
+  protected function format($causeMessage = NULL)
+  {
+    $message = 'No suitable exchange rate found, ';
+    $message .= ' caused by: ' . \trim($causeMessage);
+    return $message;
+  }
 }
+

@@ -17,40 +17,38 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace mitgedanken\Monetary;
+namespace mitgedanken\Monetary\Interfaces;
 
 /**
- * Manages exchange rates.
+ * Represents a currency pair.
  *
  * @author Sascha Tasche <sascha@mitgedanken.de>
  */
-interface ExchangeRatesInterface {
+interface CurrencyPair {
 
   /**
-   * Attaches a currency pair with its exchange rate.
+   * Checks if this currency pair has a currency.
    *
-   * @param \mitgedanken\Monetary\CurrencyPairInterface $pair
-   * @param integer|float $rate
+   * @param \mitgedanken\Monetary\Interfaces\Currency $currency
+   * @return boolean <i>TRUE</i> if this currency pair has $currency;
+   *                 <i>FALSE</i> otherwise.
    */
-  function attach(CurrencyPairInterface $pair, $rate);
+  function has(Currency $currency);
 
   /**
-   * Dettaches a currency pair.
-   */
-  function dettach(CurrencyPairInterface $pair);
-
-  /**
-   * Return the exchange result as a money object.
+   * Determines whether or not two <i>CurrencyPair</i> objects are equal. Two
+   * instances of CurrencyPairInterface are equal if they currencys are equal.
    *
-   * @param \mitgedanken\Monetary\MoneyInterface $money
-   * @param \mitgedanken\Monetary\CurrencyInterface $inCurrency
-   * @return \mitgedanken\Monetary\MoneyInterface Exchange result.
+   * @param  object  $object An object to be compared with this CurrencyPaiInterface.
+   * @return boolean <i>TRUE</i> if the object to be compared is an instance of
+   *                 <i>CurrencyPair</i> and has the same currency code;
+   *                 <i>FALSE</i> otherwise.
    */
-  function exchange(MoneyInterface $money, CurrencyInterface $inCurrency);
+  function equals($object);
 
   /**
    * Return its identifier.<br/>
-   * Exchange rates are identifiable by its class name.
+   * A currency pair is identifiable by its pair's currency codes.
    *
    * @return string Its identifier.
    */

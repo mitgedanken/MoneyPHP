@@ -17,25 +17,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace mitgedanken\Monetary\Exception;
+namespace mitgedanken\Monetary\Interfaces;
 
 /**
- * Description of NoSuitableMoney
+ * Marker interface.
  *
  * @author Sascha Tasche <sascha@mitgedanken.de>
  */
-class NoExchangeRatesDefined extends RuntimeException {
+interface MonetaryStorage {
 
-  protected function format($causeMessage = NULL)
-  {
-    $message = 'No exchange rates defined ';
-    $causeMessage = \trim($causeMessage);
-    if (empty($causeMessage)):
-      $message .= '.';
-    else:
-      $message .= ', caused by: ' . $causeMessage;
-    endif;
-    return $message;
-  }
+  /**
+   * Calculate a unique identifier for the contained objects.
+   * @link http://php.net/manual/en/splobjectstorage.gethash.php
+   * @param object $object The object whose identifier is to be calculated.
+   * @return string A string with the calculated identifier.
+   */
+  public function getHash($object);
 }
-

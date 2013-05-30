@@ -17,7 +17,7 @@
  * along with this program . If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace mitgedanken\Monetary;
+namespace mitgedanken\Monetary\Interfaces;
 
 /**
  * <i>Immutable</i></p>
@@ -25,7 +25,7 @@ namespace mitgedanken\Monetary;
  *
  * @author Sascha Tasche <sascha@mitgedanken.de>
  */
-interface CurrencyInterface {
+interface Currency {
 
   /**
    * Return its currency code (ISO 4217).

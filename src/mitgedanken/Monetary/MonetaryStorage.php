@@ -24,7 +24,8 @@ namespace mitgedanken\Monetary;
  *
  * @author Sascha Tasche <sascha@mitgedanken.de>
  */
-class MonetaryStorage extends \SplObjectStorage {
+class MonetaryStorage extends \SplObjectStorage
+        implements Interfaces\MonetaryStorage {
 
   /**
    * <i>Override</i><br/>

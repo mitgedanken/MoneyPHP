@@ -17,20 +17,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace mitgedanken\Monetary\Exception;
+namespace mitgedanken\Monetary\Exceptions;
 
 /**
- * Description of NoSuitableExchangeRate
+ * Description of RuntimeException
  *
  * @author Sascha Tasche <sascha@mitgedanken.de>
  */
-class NoSuitableExchangeRate extends RuntimeException {
+class RuntimeException extends Exception {
+
+  const CODE = -1;
 
   protected function format($causeMessage = NULL)
   {
-    $message = 'No suitable exchange rate found, ';
+    $message = 'RuntimeException, ';
     $message .= ' caused by: ' . \trim($causeMessage);
     return $message;
   }
 }
-

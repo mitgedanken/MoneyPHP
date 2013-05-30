@@ -17,21 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace mitgedanken\Monetary\Exception;
+namespace mitgedanken\Monetary\Exceptions;
 
-/**
- * Description of RuntimeException
+/** TODO
+ * BadFunctionCallException.
  *
  * @author Sascha Tasche <sascha@mitgedanken.de>
  */
-class RuntimeException extends Exception {
+class BadFunctionCall extends LogicException {
 
-  const CODE = -1;
+  const CODE = 1001;
 
-  protected function format($causeMessage = NULL)
-  {
-    $message = 'RuntimeException, ';
-    $message .= ' caused by: ' . \trim($causeMessage);
-    return $message;
-  }
 }

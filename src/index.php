@@ -1,13 +1,27 @@
 <?php
 
+namespace mitgedanken\Monetary;
+
 define('ROOT', __DIR__);
 require_once ROOT . '/scripts/init_monetary.php';
 // define('MODULE_AUTOLOAD')
-use mitgedanken\Monetary\Money,
-    mitgedanken\Monetary\Currency;
 
-$amount = 20;
-$usd = new Money($amount, new Currency('USD'));
-$eur = new Money($amount, new Currency('EUR'));
+$amount = 46;
+$ratios = array(0 => 2, 1 => 3);
 
-Money::EUR($amount);
+$countRatios = count($ratios);
+$total = array_sum($ratios);
+$remainder = $amount;
+$results = new \SplFixedArray($countRatios);
+
+for ($i = 0; $i < $countRatios; $i += 1):
+  $result = $amount * $ratios[$i] / $total;
+  $results[$i] = $result;
+  $remainder -= $results[$i];
+endfor;
+
+for ($i = 0; $i < $remainder; $i++):
+  $results[$i]++;
+endfor;
+
+var_dump($results);

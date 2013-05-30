@@ -17,25 +17,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace mitgedanken\Monetary\Exception;
+namespace mitgedanken\Monetary;
 
 /**
- * Exception thrown if a length is invalid.
+ * Criteria for searching of a <i>CurrencyPair</i>.
  *
  * @author Sascha Tasche <sascha@mitgedanken.de>
  */
-class Length extends LogicException {
+interface Criteria {
 
   /**
-   * Exception code.
+   * Return the searched base currency or NULL if this criterion must not be fulfilled.
+   *
+   * @return Currency|NULL (NULL only if this criterion must not be fulfilled)
    */
-  const CODE = 1410;
+  function getBaseCurrency();
 
-  protected function format($causeMessage = NULL)
-  {
-    $message = 'Invalid length,';
-    $message .= ' caused by: ' . \trim($causeMessage);
-    return $message;
-  }
+  /**
+   * Return the searched counter currency or NULL if this criterion must not be fulfilled.
+   *
+   * @return Currency|NULL (NULL only if this criterion must not be fulfilled)
+   */
+  function getCounterCurrency();
 }
-

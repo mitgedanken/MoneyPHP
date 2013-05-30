@@ -17,28 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace mitgedanken\Monetary\Exception;
+namespace mitgedanken\Monetary\Exceptions;
 
-/**
- * DifferentCurrencies.
- *
- * @author Sascha Tasche <sascha@mitgedanken.de>
- */
-class DifferentCurrencies extends LogicException {
+class DivisionByZero extends InvalidArgument {
 
   /**
    * Exception code.
    */
-  const CODE = 1401;
+  const CODE = 1418;
 
-  /**
-   * Formats the message string for this exception.
-   *
-   * @param string $causeMessage
-   */
   protected function format($causeMessage = NULL)
   {
-    $message = 'Different currencies';
+    $message = 'Division by zero';
     $causeMessage = \trim($causeMessage);
     if (empty($causeMessage)):
       $message .= '.';

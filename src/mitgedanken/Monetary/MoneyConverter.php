@@ -18,18 +18,27 @@
  */
 
 namespace mitgedanken\Monetary;
+use mitgedanken\Monetary\Exceptions\NoSuitableExchangeRate,
+    mitgedanken\Monetary\Exceptions\InvalidArgument;
 
 /**
- * Manages exchange rates. Implementation of <i>ExchangeRatesInterface</i>.
+ * Manages exchange rates. Implementation of <i>MoneyConverter</i>.
  *
  * @author Sascha Tasche <sascha@mitgedanken.de>
  */
-class ExchangeRates implements ExchangeRatesInterface {
+class MoneyConverter implements Interfaces\MoneyConverter {
 
   /**
    * Holds the exchange rates.
    */
   protected $storage;
+
+  /**
+   * Holds the rounding algorithm.
+   *
+   * @var \Closure Its current rounding algorithm,
+   */
+  protected $rounding_algo;
 
   /**
    * [default: FALSE]
@@ -39,6 +48,7 @@ class ExchangeRates implements ExchangeRatesInterface {
   /**
    * Constructor.
    *
+   * @param \Closure $rounding_algo The rounding algorithm.
    * @param \SplObjectStorage $storage
    * @param boolean $noSuitableException
    *        Set to <i>TRUE</i> to thow a <i>NoSuitableExchangeRate</i> exception
@@ -55,50 +65,37 @@ class ExchangeRates implements ExchangeRatesInterface {
     endif;
   }
 
-  /**
-   * Set if a <i>NoSuitableExchangeRate</i> exception is thrown if no suitable
-   * exchange rate was found.
-   *
-   * @param boolean $boolean
-   */
   public function setNoSuitableException($boolean)
   {
+    if (!is_bool($boolean)):
+      $type = \gettype($boolean);
+      $message = 'Boolean required for $boolean' . "(but was $type)";
+      throw new InvalidArgument($message);
+    endif;
     $this->noSuitableException = $boolean;
   }
 
-  /**
-   * Attaches a exchange rate.<br/>
-   * It is consisting of a <i>CurrencyPair</i> and a exchange rate.
-   *
-   * @param \mitgedanken\Monetary\CurrencyPairInterface $pair
-   * @param type $rate
-   */
-  public function attach(CurrencyPairInterface $pair, $rate)
+  public function attach(Interfaces\CurrencyPair $pair, $ratios)
   {
-    $this->storage->attach($pair, $rate);
+    $this->_requiresIntegerOrFloatOrArray($ratios, 'ratios', __METHOD__);
+    if (!$this->storage->contains($pair)):
+      $this->storage->attach($pair, $ratios);
+    endif;
   }
 
-  /**
-   * Dettaches a exchange rate.<br/>
-   *
-   * @param \mitgedanken\Monetary\CurrencyPairInterface $pair
-   */
-  public function dettach(CurrencyPairInterface $pair)
+  public function replace(Interfaces\CurrencyPair $pair, $ratios)
+  {
+    $this->_requiresIntegerOrFloatOrArray($ratios, 'ratios', __METHOD__);
+    $this->storage->attach($pair, $ratios);
+  }
+
+  public function detach(Interfaces\CurrencyPair $pair)
   {
     $this->storage->detach($pair);
   }
 
-  /**
-   * Exchanges the given <i>Money</i> object to the given <i>Currency</i>.<br/>
-   * It throws a <i>NoSuitableExchangeRate</i> exception if this object has been
-   * set for it.
-   *
-   * @param \mitgedanken\Monetary\MoneyInterface $money
-   * @param \mitgedanken\Monetary\CurrencyInterface $toCurrency
-   * @return \mitgedanken\Monetary\Money
-   * @throws NoSuitableExchangeRate If this object has been set for it..
-   */
-  public function exchange(MoneyInterface $money, CurrencyInterface $toCurrency)
+  public function convert(Interfaces\Money $money,
+                          Interfaces\Currency $toCurrency)
   {
     $result = NULL;
     $fromCurrency = $money->getCurrency();
@@ -107,13 +104,13 @@ class ExchangeRates implements ExchangeRatesInterface {
       $pair = new CurrencyPair($fromCurrency, $toCurrency);
       $this->storage->rewind();
       while (!$found && $this->storage->valid()):
-        $rates = $this->storage->getInfo();
+        $ratios = $this->storage->getInfo();
         $found = $this->storage->current()->equals($pair);
         $this->storage->next();
       endwhile;
     endif;
     if ($found):
-      $exchangeResult = $money->multiply($rates[1])->divide($rates[0]);
+      $exchangeResult = $money->multiply($ratios[1])->divide($ratios[0]);
       $result = new Money($exchangeResult->getAmount(), $toCurrency);
     else:
       if ($this->noSuitableException):
@@ -135,6 +132,24 @@ class ExchangeRates implements ExchangeRatesInterface {
   public function __toString()
   {
     return __CLASS__;
+  }
+
+  /**
+   * Validates an argument.
+   *
+   * @param integer|float $argument argument to validate.
+   * @param string $name argument as string.
+   * @param string $method method name which uses this function.
+   * @throws InvalidArgument
+   */
+  protected function _requiresIntegerOrFloatOrArray($argument, $name, $method)
+  {
+    if (!\is_int($argument) && !\is_float($argument) && !\is_array($argument)):
+      $type = \gettype($argument);
+      $message = "Integer or float or array required for $name
+        (but was $type; in $method)";
+      throw new InvalidArgument($message);
+    endif;
   }
 }
 

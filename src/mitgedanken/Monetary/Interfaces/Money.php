@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace mitgedanken\Monetary;
+namespace mitgedanken\Monetary\Interfaces;
 
 /**
  * <i>Immutable</i></br>
@@ -25,7 +25,7 @@ namespace mitgedanken\Monetary;
  *
  * @author Sascha Tasche <sascha@mitgedanken.de>
  */
-interface MoneyInterface {
+interface Money {
 
   /**
    * Return its ammount.
@@ -37,51 +37,30 @@ interface MoneyInterface {
   /**
    * Retuns its currency object.
    *
-   * @return \mitgedanken\Monetary\Currency Its currency object.
+   * @return \mitgedanken\Monetary\Interfaces\Currency Its currency object.
    */
   function getCurrency();
-
-  /**
-   * Checks if this <i>Money</i> has the same amount as the other.
-   * <i>The objects must have the same currency.</i></p>
-   *
-   * @param \mitgedanken\Monetary\MoneyInterface $other
-   * @return boolean <b>TRUE</b> if this monetary value has
-   *                 the same amount and the same currency as the other;
-   *                 <b>FALSE</b> otherwise.
-   */
-  public function hasSameAmount(MoneyInterface $other);
-
-  /**
-   * Checks if its currency is "equal to" the $currency argument.
-   *
-   * @param \mitgedanken\Monetary\MoneyInterface $other
-   * @return boolean <b>TRUE</b> if this monetary value has
-   *                 the same currency as the other;
-   *                 <b>FALSE</b> otherwise.
-   */
-  function hasSameCurrency(MoneyInterface $currency);
 
   /**
    * Return a new <i>Money</i> object that represents the monetary value
    * of the sum of this Money object and another.
    *
-   * @param \mitgedanken\Monetary\MoneyInterface $addend
-   * @return \mitgedanken\Monetary\MoneyInterface
+   * @param \mitgedanken\Monetary\Interfaces\Money $addend
+   * @return \mitgedanken\Monetary\Interfaces\Money
    * @throws InvalidArgumentException
    * @throws DifferentCurrencies If $addend has a different currency.
    */
-  function add(MoneyInterface $addend);
+  function add(Money $addend);
 
   /**
    * Return a new <i>Money</i> object that represents the monetary value
    * of the difference of this Money object and another.
    *
-   * @param \mitgedanken\Monetary\MoneyInterface $subtrahend
-   * @return \mitgedanken\Monetary\MoneyInterface
+   * @param \mitgedanken\Monetary\Interfaces\Money $subtrahend
+   * @return \mitgedanken\Monetary\Interfaces\Money
    * @throws InvalidArgumentException
    */
-  function subtract(MoneyInterface $subtrahend);
+  function subtract(Money $subtrahend);
 
   /**
    * Return a new <i>Money</i> object that represents the monetary value
@@ -90,7 +69,7 @@ interface MoneyInterface {
    * @see _multiplyAlgo
    * @param  float|integer $multiplier
    * @param boolean $rounding [default: TRUE] rounds the result if </i>TRUE</i>
-   * @return \mitgedanken\Monetary\MoneyInterface
+   * @return \mitgedanken\Monetary\Interfaces\Money
    * @throws InvalidArgumentException
    */
   function multiply($multiplier, $rounding = TRUE);
@@ -99,55 +78,45 @@ interface MoneyInterface {
    * Return a new <i>Money</i> object that represents the monetary value
    * of this Money object divided by a given divisor.
    *
-   * @param  integer|\mitgedanken\Monetary\MoneyInterface $divisor
+   * @param  integer|\mitgedanken\Monetary\Interfaces\Money $divisor
    * @param boolean $rounding [default: TRUE] rounds the result if </i>TRUE</i>
-   * @return \mitgedanken\Monetary\MoneyInterface
+   * @return \mitgedanken\Monetary\Interfaces\Money
    * @throws InvalidArgumentException
    * @throws DivisionByZero
    */
   function divide($divisor, $rounding = TRUE);
 
   /**
-   * Return a new Money object that represents the monetary value
-   * of this Money object, allocated according to a list of ratio's.
-   *
-   * @param array $ratios the ratio's.
-   * @param boolean $rounding [default: FALSE] rounds the result if </i>TRUE</i>
-   * @return \mitgedanken\Monetary\MoneyInterface[] the allocated monies.
-   */
-  public function allocate($ratios, $rounding = FALSE);
-
-  /**
    * Compares this <i>Money</i> object to another with the same currency.
    * If both monetary values are zero, they currency must not be the same.
    *
-   * @param \mitgedanken\Monetary\MoneyInterface $other the other <i>Money</i>.
+   * @param \mitgedanken\Monetary\Interfaces\Money $other the other <i>Money</i>.
    * @return integer  0 if they are equal,
    *                 -1 if the other amount is greater or
    *                  1 if the other amount is less.
    * @throws InvalidArgumentException
    */
-  function compare(MoneyInterface $other);
+  function compare(Money $other);
 
   /**
    * Checks if this <i>Money</i> object is greater than the other.
    *
-   * @param \mitgedanken\Monetary\MoneyInterface $other
+   * @param \mitgedanken\Monetary\Interfaces\Money $other
    * @return boolean <b>TRUE</b> if the value is greater than the other;
    *                 <b>FALSE</b> otherwise.
    * @throws InvalidArgumentException
    */
-  function greaterThan(MoneyInterface $other);
+  function greaterThan(Money $other);
 
   /**
    * Checks if this <i>Money</i> object is less than the other.
    *
-   * @param \mitgedanken\Monetary\MoneyInterface $other
+   * @param \mitgedanken\Monetary\Interfaces\Money $other
    * @return boolean <b>TRUE</b> if the value is less than the other.
    *                 <b>FALSE</b> otherwise.
    * @throws InvalidArgumentException
    */
-  function lessThan(MoneyInterface $other);
+  function lessThan(Money $other);
 
   /**
    * Checks if the amount is zero.

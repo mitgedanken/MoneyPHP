@@ -18,8 +18,8 @@
  */
 
 namespace mitgedanken\Monetary;
-use mitgedanken\Monetary\Exception\Length,
-    mitgedanken\Monetary\Exception\InvalidArgument;
+use mitgedanken\Monetary\Exceptions\Length,
+    mitgedanken\Monetary\Exceptions\InvalidArgument;
 
 /**
  * <i>Immutable</i><br/>
@@ -27,7 +27,7 @@ use mitgedanken\Monetary\Exception\Length,
  *
  * @author Sascha Tasche <sascha@mitgedanken.de>
  */
-class Currency implements CurrencyInterface {
+class Currency implements Interfaces\Currency {
 
   /**
    * Holds its display name.
@@ -75,7 +75,7 @@ class Currency implements CurrencyInterface {
    *
    * @param string $name
    * @param array $arguments 0:string, currency code; 1:string, display name;
-   * @return \mitgedanken\Monetary\Currency
+   * @return \mitgedanken\Monetary\Interfaces\Currency
    */
   public static function __callStatic($name, $arguments)
   {
@@ -103,7 +103,7 @@ class Currency implements CurrencyInterface {
     $equals = FALSE;
     if ($object instanceof NullCurrency):
       $equals = TRUE;
-    elseif ($object instanceof CurrencyInterface):
+    elseif ($object instanceof Currency):
       $equals = ($this->code == $object->getCode());
     endif;
     return $equals;

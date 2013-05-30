@@ -17,16 +17,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace mitgedanken\Monetary\Exception;
+namespace mitgedanken\Monetary\Exceptions;
 
 /**
- * LogicException.
+ * Description of NoSuitableMoney
  *
  * @author Sascha Tasche <sascha@mitgedanken.de>
  */
-class LogicException extends Exception {
-  /**
-   * Exception code.
-   */
-  const CODE = 1000;
+class NoExchangeRatesDefined extends RuntimeException {
+
+  protected function format($causeMessage = NULL)
+  {
+    $message = 'No exchange rates defined ';
+    $causeMessage = \trim($causeMessage);
+    if (empty($causeMessage)):
+      $message .= '.';
+    else:
+      $message .= ', caused by: ' . $causeMessage;
+    endif;
+    return $message;
+  }
 }
+
