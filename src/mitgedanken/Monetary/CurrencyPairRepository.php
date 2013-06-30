@@ -20,23 +20,23 @@
 namespace mitgedanken\Monetary;
 
 /**
- * Description of CurrencyPairRepository
+ * CurrencyPairRepository
  *
  * @author Sascha Tasche <sascha@mitgedanken.de>
  */
 class CurrencyPairRepository implements \Countable {
-
+  use Traits\Monetary;
   /**
    * Holds its currency pairs.
    *
-   * @var \Traversable
+   * @var \SplObjectStorage
    */
   private $storage;
 
   /**
    * @param \Traversable $storage [optional]
    */
-  public function __construct(\Traversable $storage = NULL)
+  public function __construct(\SplObjectStorage $storage = NULL)
   {
     if (isset($storage)):
       $this->storage = $storage;
@@ -48,7 +48,7 @@ class CurrencyPairRepository implements \Countable {
   /**
    * Attaches a <i>CurrencyPair</i>.
    *
-   * @param \mitgedanken\Monetary\Interfaces\CurrencyPair $pair
+   * @param \mitgedanken\Monetary\CurrencyPair $pair
    */
   public function attach(CurrencyPair $pair)
   {
@@ -71,44 +71,9 @@ class CurrencyPairRepository implements \Countable {
    * @param \ArrayAccess $storage
    * @return void No return value.
    */
-  public function replaceStorage(\Traversable $storage)
+  public function replaceStorage(\SplObjectStorage $storage)
   {
     $this->storage = $storage;
-  }
-
-  /**
-   * This method finds <i>CurrencyPair</i> by a <i>Criteria</i>.<br/>
-   * Return a <i>SplObjectStorage</i> with any <i>CurrencyPair</i> object that
-   * fulfill the criteria.
-   *
-   * @param \mitgedanken\Monetary\Criteria $criteria
-   * @return \SplObjectStorage
-   */
-  public function findBy(Criteria $criteria)
-  {
-    $baseCurrency = $criteria->getBaseCurrency();
-    $counterCurrency = $criteria->getCounterCurrency();
-    $fulfilled = new \SplObjectStorage();
-    foreach ($this->storage as $key):
-      if ($key instanceof CurrencyPair):
-        if ($baseCurrency instanceof Currency):
-          $hasBaseCurrency = $key->has($baseCurrency);
-        else:
-          $hasBaseCurrency = TRUE;
-        endif;
-
-        if ($counterCurrency instanceof Currency):
-          $hasCounterCurrency = $key->has($counterCurrency);
-        else:
-          $hasCounterCurrency = TRUE;
-        endif;
-
-        if ($hasBaseCurrency || $hasCounterCurrency):
-          $fulfilled->attach($key);
-        endif;
-      endif;
-    endforeach;
-    return $fulfilled;
   }
 
   /**
@@ -119,5 +84,41 @@ class CurrencyPairRepository implements \Countable {
   public function count()
   {
     return count($this->storage);
+  }
+
+  /**
+   * <i>Implemented</i>
+   * This method finds <i>CurrencyPair</i> by a <i>Criteria</i>.<br/>
+   * Return a <i>SplObjectStorage</i> with any <i>CurrencyPair</i> object that
+   * fulfill the criteria.
+   *
+   * @param \mitgedanken\Monetary\Interfaces\CurrencyPairCriteria $criteria
+   * @return \SplObjectStorage
+   */
+  public function findBy(Interfaces\CurrencyPairCriteria $criteria)
+  {
+    $baseCurrency = $criteria->getBaseCurrency();
+    $counterCurrency = $criteria->getCounterCurrency();
+    $fulfilled = new \SplObjectStorage();
+    foreach ($this->storage as $key):
+      if ($key instanceof CurrencyPair):
+        if ($baseCurrency instanceof Currency):
+          $baseFulfilled = $key->getBaseCurrency()->equals(($baseCurrency));
+        else:
+          $baseFulfilled = TRUE;
+        endif;
+
+        if ($counterCurrency instanceof Currency):
+          $counterFulfilled = $key->getCounterCurrency()->equals($counterCurrency);
+        else:
+          $counterFulfilled = TRUE;
+        endif;
+
+        if ($baseFulfilled || $counterFulfilled):
+          $fulfilled->attach($key);
+        endif;
+      endif;
+    endforeach;
+    return $fulfilled;
   }
 }

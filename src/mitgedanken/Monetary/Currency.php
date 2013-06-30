@@ -27,8 +27,8 @@ use mitgedanken\Monetary\Exceptions\Length,
  *
  * @author Sascha Tasche <sascha@mitgedanken.de>
  */
-class Currency implements Interfaces\Currency {
-
+class Currency {
+  use Traits\Monetary;
   /**
    * Holds its display name.
    *
@@ -75,7 +75,7 @@ class Currency implements Interfaces\Currency {
    *
    * @param string $name
    * @param array $arguments 0:string, currency code; 1:string, display name;
-   * @return \mitgedanken\Monetary\Interfaces\Currency
+   * @return \mitgedanken\Monetary\Currency
    */
   public static function __callStatic($name, $arguments)
   {
@@ -88,27 +88,62 @@ class Currency implements Interfaces\Currency {
     return $currency;
   }
 
+  /**
+   * TODO
+   * Return its currency code. ISO 42..
+   *
+   * @return string(3)
+   */
   public function getCode()
   {
     return $this->code;
   }
 
+  /**
+   * Return its name.
+   *
+   * @return string
+   */
   public function getName()
   {
     return $this->name;
   }
 
+  /**
+   * <i>Class is immutable</i><br/>
+   * Cloning is not supported.
+   *
+   * @throws Exceptions\UnsupportedOperation
+   */
+  public function __clone()
+  {
+    throw new Exceptions\UnsupportedOperation('__clone not supported');
+  }
+
+  /**
+   * TODO
+   * Indicates whether this object is "equal to" another.<br/>
+   * This object is "equal to" another if that is an instance of <i>Currency<i> or
+   * <i>NullCurrency</i> and the codes are equal.<br/>
+   * <i>Note</i>: <i>NullCurrency</i> doesn't need a code to be "equal to".
+   *
+   * @param mixed $object
+   * @return boolean
+   */
   public function equals($object)
   {
     $equals = FALSE;
-    if ($object instanceof NullCurrency):
-      $equals = TRUE;
-    elseif ($object instanceof Currency):
-      $equals = ($this->code == $object->getCode());
+    if ($object instanceof Currency):
+      $equals = ($this->code == $object->code);
     endif;
     return $equals;
   }
 
+  /**
+   * Return its identifier.
+   *
+   * @return string
+   */
   public function identify()
   {
     return '' . $this->code;

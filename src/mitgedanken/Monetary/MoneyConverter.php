@@ -26,8 +26,8 @@ use mitgedanken\Monetary\Exceptions\NoSuitableExchangeRate,
  *
  * @author Sascha Tasche <sascha@mitgedanken.de>
  */
-class MoneyConverter implements Interfaces\MoneyConverter {
-
+class MoneyConverter {
+  use Traits\Monetary;
   /**
    * Holds the exchange rates.
    */
@@ -65,6 +65,12 @@ class MoneyConverter implements Interfaces\MoneyConverter {
     endif;
   }
 
+  /**
+   * Set if a <i>NoSuitableExchangeRate</i> exception is thrown if no suitable
+   * exchange rate was found.
+   *
+   * @param boolean $boolean
+   */
   public function setNoSuitableException($boolean)
   {
     if (!is_bool($boolean)):
@@ -75,7 +81,15 @@ class MoneyConverter implements Interfaces\MoneyConverter {
     $this->noSuitableException = $boolean;
   }
 
-  public function attach(Interfaces\CurrencyPair $pair, $ratios)
+  /**
+   * Attaches a exchange rate.<br/>
+   *
+   * A exchange rate is consisting of a <i>CurrencyPair</i> and a exchange rate.
+   *
+   * @param \mitgedanken\Monetary\CurrencyPair $pair
+   * @param array|integer|float $ratios
+   */
+  public function attach(CurrencyPair $pair, $ratios)
   {
     $this->_requiresIntegerOrFloatOrArray($ratios, 'ratios', __METHOD__);
     if (!$this->storage->contains($pair)):
@@ -83,19 +97,41 @@ class MoneyConverter implements Interfaces\MoneyConverter {
     endif;
   }
 
-  public function replace(Interfaces\CurrencyPair $pair, $ratios)
+  /**
+   * Replaces a exchange rate.<br/>
+   *
+   * A exchange rate is consisting of a <i>CurrencyPair</i> and a exchange rate.
+   *
+   * @param \mitgedanken\Monetary\CurrencyPair $pair
+   * @param array $ratios
+   */
+  public function replace(CurrencyPair $pair, $ratios)
   {
     $this->_requiresIntegerOrFloatOrArray($ratios, 'ratios', __METHOD__);
     $this->storage->attach($pair, $ratios);
   }
 
-  public function detach(Interfaces\CurrencyPair $pair)
+  /**
+   * Dettaches a exchange rate.
+   *
+   * @param \mitgedanken\Monetary\CurrencyPair $pair
+   */
+  public function detach(CurrencyPair $pair)
   {
     $this->storage->detach($pair);
   }
 
-  public function convert(Interfaces\Money $money,
-                          Interfaces\Currency $toCurrency)
+  /**
+   * Exchanges the given <i>Money</i> object to the given <i>Currency</i>.<br/>
+   * It throws a <i>NoSuitableExchangeRate</i> exception if this object has been
+   * set for it.
+   *
+   * @param \mitgedanken\Monetary\Abstracts\Money $money
+   * @param \mitgedanken\Monetary\Currency $toCurrency
+   * @return \mitgedanken\Monetary\Money
+   * @throws NoSuitableExchangeRate If this object has been set for it.
+   */
+  public function convert(Abstracts\Money $money, Currency $toCurrency)
   {
     $result = NULL;
     $fromCurrency = $money->getCurrency();
@@ -124,6 +160,20 @@ class MoneyConverter implements Interfaces\MoneyConverter {
     return $result;
   }
 
+  /**
+   * TODO
+   */
+  public function equals($object)
+  {
+
+  }
+
+  /**
+   * Return its identifier.<br/>
+   * Exchange rates are identifiable by its class name.
+   *
+   * @return string Its identifier.
+   */
   public function identify()
   {
     return __CLASS__;

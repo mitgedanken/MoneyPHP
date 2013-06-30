@@ -17,26 +17,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace mitgedanken\Monetary;
+namespace mitgedanken\Monetary\Interfaces;
 
 /**
- * MonetaryStorage.
+ * Criteria for searching of a <i>CurrencyPair</i>.
  *
  * @author Sascha Tasche <sascha@mitgedanken.de>
  */
-class MonetaryStorage extends \SplObjectStorage
-        implements Interfaces\MonetaryStorage {
-  use Traits\Monetary;
+interface CurrencyPairCriteria {
 
   /**
-   * <i>Override</i><br/>
-   * Calculate a unique identifier for the contained objects.
-   * @link http://php.net/manual/en/splobjectstorage.gethash.php
-   * @param object $object The object whose identifier is to be calculated.
-   * @return string A string with the calculated identifier.
+   * Return the searched base currency or <i>NULL</i> if this criterion must
+   * not be fulfilled.
+   *
+   * @return Currency|NULL (NULL only if this criterion must not be fulfilled)
    */
-  public function getHash($object)
-  {
-    return $object->identify();
-  }
+  function getBaseCurrency();
+
+  /**
+   * Return the searched counter currency or <i>NULL</i> if this criterion must
+   * not be fulfilled.
+   *
+   * @return Currency|NULL (NULL only if this criterion must not be fulfilled)
+   */
+  function getCounterCurrency();
 }

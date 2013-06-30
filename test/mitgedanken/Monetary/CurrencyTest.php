@@ -33,16 +33,6 @@ class CurrencyTest extends \PHPUnit_Framework_TestCase {
   {
     $this->usd = new Currency('USD');
     $this->eur = new Currency('EUR');
-    $this->n = new NullCurrency('');
-  }
-
-  /**
-   * Tears down the fixture, for example, closes a network connection.
-   * This method is called after a test is executed.
-   */
-  protected function tearDown()
-  {
-
   }
 
   /**
@@ -60,8 +50,5 @@ class CurrencyTest extends \PHPUnit_Framework_TestCase {
   {
     $this->assertTrue($this->usd->equals($this->usd));
     $this->assertFalse($this->usd->equals($this->eur));
-
-    $this->assertTrue($this->eur->equals($this->n));
-    $this->assertTrue($this->n->equals($this->eur));
   }
 }

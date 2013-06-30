@@ -19,24 +19,34 @@
 
 namespace mitgedanken\Monetary;
 
+// Reserved for future use.
+
+define('MODULE_MONETARY', __DIR__ . DIRECTORY_SEPARATOR . 'module_monetary');
 /**
- * Criteria for searching of a <i>CurrencyPair</i>.
+ * TODO
+ * Module
  *
  * @author Sascha Tasche <sascha@mitgedanken.de>
  */
-interface Criteria {
+class module_monetary {
 
-  /**
-   * Return the searched base currency or NULL if this criterion must not be fulfilled.
-   *
-   * @return Currency|NULL (NULL only if this criterion must not be fulfilled)
-   */
-  function getBaseCurrency();
-
-  /**
-   * Return the searched counter currency or NULL if this criterion must not be fulfilled.
-   *
-   * @return Currency|NULL (NULL only if this criterion must not be fulfilled)
-   */
-  function getCounterCurrency();
+  public static function info()
+  {
+    return [
+        'name' => 'MoneyPHP',
+        'id' => 'mitgedanken::MoneyPHP(Monetary)$13.26.0-alpha',
+        'desc' => 'A monetary value object based on Money by Martin Fowler.',
+        'version' => '13.26.0-alpha',
+        'min_stability' => 'dev',
+        'require' => [],
+        'forks' => '',
+        'php' => '>=5.4.0',
+        'path' => __DIR__,
+        'maintainer' => 'mitgedanken (Sascha Tasche)',
+        'authors' => [0 => 'Sascha Tasche'],
+        'repository' => 'https://github.com/mitgedanken/MoneyPHP',
+        'licence' => 'gpl3',
+        'doc' => '',
+        'website' => ''];
+  }
 }

@@ -23,6 +23,14 @@ class MonetaryStorageTest extends \PHPUnit_Framework_TestCase {
 
   /**
    * @test
+   */
+  public function implementsCountable()
+  {
+    $this->assertTrue(\is_a($this->object, 'Countable'));
+  }
+
+  /**
+   * @test
    * @covers mitgedanken\Monetary\MonetaryStorage::attach
    */
   public function test()

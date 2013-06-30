@@ -1,6 +1,27 @@
 CHANGE LOG
 ==========
 
+13.26.0-alpha
+-------------
+maximum-stability: dev
+
+* Changes
+ - "Operation: We need interfaces!" canceled.
+ - No more NullCurrency nightmares
+ - MoneyBag added methods: getSlenderizedStorage, addSlenderizedStorage
+
+* Refactorings
+ - Interfaces\Money refactored to Abstracts\Money
+ - Money refactored (angepasst)
+
+* New classes
+ - CurrencyPairRepository
+ - SlenderMoney
+ - Abstracts\CurrencyPairCriteria
+
+* Some improvements an fixes
+
+
 13.22.2-alpha
 -------------
 * Changes

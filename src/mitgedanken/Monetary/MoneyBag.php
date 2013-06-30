@@ -30,11 +30,11 @@ use mitgedanken\Monetary\Exceptions\UnsupportedOperation,
  * a different currency than this object's currency will throw an Exception.
  *
  * By using own implementation of a <i>MonetaryStorage</i> (\SplObjectStorage)
- * the implementor must garantee that each element is contained only once.
+ * the implementor must guarantee that each element is contained only once.
  *
  * @author Sascha Tasche <sascha@mitgedanken.de>
  */
-class MoneyBag extends Money implements Interfaces\MoneyBag, \Countable {
+class MoneyBag extends Money implements \Countable {
 
   /**
    * Exchange rates.
@@ -54,15 +54,15 @@ class MoneyBag extends Money implements Interfaces\MoneyBag, \Countable {
    * If <i>$storage</i> is <i>NULL</i> it will instaniate an empty <i>MonetaryStorage</i>.
    *
    * @param integer|float $amount
-   * @param \mitgedanken\Monetary\Interfaces\Currency $defaultCurrency
-   * @param \mitgedanken\Monetary\Interfaces\MoneyConverter $rates [default: NULL]
+   * @param \mitgedanken\Monetary\Currency $defaultCurrency
+   * @param \mitgedanken\Monetary\Abstracts\MoneyConverter $converter [default: NULL]
    * @param \mitgedanken\Monetary\Interfaces\MonetaryStorage $storage [default: NULL]
    *
-   * @param \SplObjectStorage $storage [nullable]
+   * @param \ArrayAccess $storage [nullable]
    */
-  public function __construct($amount, Interfaces\Currency $defaultCurrency,
-                              Interfaces\MoneyConverter $rates = NULL,
-                              \SplObjectStorage $storage = NULL)
+  public function __construct($amount, Currency $defaultCurrency,
+                              MoneyConverter $converter = NULL,
+                              \ArrayAccess $storage = NULL)
   {
     parent::__construct($amount, $defaultCurrency);
     if (!isset($storage)):
@@ -72,18 +72,25 @@ class MoneyBag extends Money implements Interfaces\MoneyBag, \Countable {
     $defaultMoney = new Money($amount, $defaultCurrency);
     $this->storage->attach($defaultMoney);
 
-    if (isset($rates)):
-      $this->moneyConverter = $rates;
+    if (isset($converter)):
+      $this->moneyConverter = $converter;
     else:
       $this->moneyConverter = new MoneyConverter();
     endif;
   }
 
-  public function addMoney(Interfaces\Money $addendMoney)
+  /**
+   * Adds a <i>Money</i> object to this MoneyBag.
+   * @see \mitgedanken\Monetary\Abstracts\Money::add
+   *
+   * @param \mitgedanken\Monetary\Abstracts\Money $money
+   * @return \mitgedanken\Monetary\Abstracts\Money
+   */
+  public function addMoney(Abstracts\Money $addendMoney, $rounding = FALSE)
   {
     $found = $this->_findByMoney($addendMoney);
     if (\is_object($found)):
-      $new = $found->add($addendMoney);
+      $new = $found->add($addendMoney, $rounding);
       if ($this->hasSameCurrency($found)):
         $this->amount += $new->amount;
       endif;
@@ -99,23 +106,45 @@ class MoneyBag extends Money implements Interfaces\MoneyBag, \Countable {
     return $result;
   }
 
-  public function addMoneyBag(Interfaces\MoneyBag $addendMoneyBag)
+  /**
+   * Adds a MoneyBag object to this MoneyBag.
+   * @see \mitgedanken\Monetary\Abstracts\Money::add
+   *
+   * @param \mitgedanken\Monetary\Abstracts\MoneyBagInterface $moneyBag
+   * @return \mitgedanken\Monetary\Abstracts\Money
+   */
+  public function addMoneyBag(MoneyBag $addendMoneyBag, $rounding = FALSE)
   {
     /* Converting MoneyBag to Money */
     $money = new Money($addendMoneyBag->amount, $addendMoneyBag->currency);
-    return $this->addMoney($money);
+    return $this->addMoney($money, $rounding);
   }
 
-  public function add(Interfaces\Money $addend, $compatMode = FALSE)
+  /**
+   * <i>Override</i>
+   * It throws a <i>DifferentCurrencies</i> only if it is used in
+   * compat mode. If compat mode is used, it will throw a <i>DifferentCurrencies</i>
+   * if <b>$addend</b> has a different currency.
+   *
+   * @param \mitgedanken\Monetary\Abstracts\Money $addend
+   * @param bool $compatMode [default: FALSE] <i>TRUE</i> to using compat mode.
+   * @return \mitgedanken\Monetary\Abstracts\Money
+   * @throws UnsupportedOperationException
+   *    If $addend is not an instance of <i>MoneyBagInterface</i> or <i>MoneyInterface</i>.
+   * @throws DifferentCurrencies
+   *    If $compatMode is <i>TRUE</i> and if $addend has a different currency.
+   */
+  public function add(Abstracts\Money $addend, $rounding = FALSE,
+                      $compatMode = FALSE)
   {
     if ($compatMode):
       parent::_requiresSameCurrency($addend->getCurrency(), __METHOD__);
     endif;
 
-    if ($addend instanceof Interfaces\MoneyBag):
-      $result = $this->addMoneyBag($addend);
-    elseif ($addend instanceof Money):
-      $result = $this->addMoney($addend);
+    if ($addend instanceof MoneyBag):
+      $result = $this->addMoneyBag($addend, $rounding = FALSE);
+    elseif ($addend instanceof Abstracts\Money):
+      $result = $this->addMoney($addend, $rounding = FALSE);
     else:
       $message = 'Unsupported object type;
         expected: MoneyInterface or MoneyBagInterface, but was: '
@@ -125,19 +154,28 @@ class MoneyBag extends Money implements Interfaces\MoneyBag, \Countable {
     return $result;
   }
 
-  public function subtract(Interfaces\Money $subtrahend)
+  public function subtract(Abstracts\Money $subtrahend, $rounding = FALSE)
   {
     $object = $this->_findByMoney($subtrahend);
     if (!\is_object($object)):
       throw new DifferentCurrencies($subtrahend);
     endif;
-    $newObject = $object->subtract($subtrahend);
+    $newObject = $object->subtract($subtrahend, $rounding);
     $this->storage->attach($newObject);
     $this->storage->detach($object);
     return $newObject;
   }
 
-  public function getMoneyIn(Interfaces\Currency $toCurrency)
+  /**
+   * Return a <i>Money</i> object which total is a conversation of all monetary
+   * amounts to the desired curreny. Its conversation is based on an given
+   * <i>ExchangeRate</i> object. It returns a <i>Money</i> object with amount
+   * of 0 if no suitable exchange rate was found.
+   *
+   * @param \mitgedanken\Monetary\Currency $currency
+   * @return \mitgedanken\Monetary\Abstracts\Money
+   */
+  public function getMoneyIn(Currency $toCurrency)
   {
     if (is_null($this->moneyConverter)):
       throw new NoExchangeRatesDefined();
@@ -156,12 +194,25 @@ class MoneyBag extends Money implements Interfaces\MoneyBag, \Countable {
     return $exchanged;
   }
 
-  public function getTotalIn(Interfaces\Currency $inCurrency)
+  /**
+   * Return a <i>Money</i> object with total amount of this <i>MoneyBag</i>
+   * object which is converted to the desired currency.
+   *
+   * @param \mitgedanken\Monetary\Currency $currency
+   * @return \mitgedanken\Monetary\Abstracts\Money Money with the total amount.
+   */
+  public function getTotalIn(Currency $inCurrency)
   {
     return $this->getMoneyIn($inCurrency)->amount;
   }
 
-  public function getTotalOf(Interfaces\Currency $inCurrency)
+  /**
+   * Return its total amount in the desired currency.
+   *
+   * @param \mitgedanken\Monetary\Currency $currencys
+   * @return integer|float Its total amount.
+   */
+  public function getTotalOf(Currency $inCurrency)
   {
     $total = 0;
     if ($this->currency->equals($inCurrency)):
@@ -172,12 +223,25 @@ class MoneyBag extends Money implements Interfaces\MoneyBag, \Countable {
     return $total;
   }
 
+  /**
+   * Sets the amount of this MoneyBag to its total.
+   *
+   * @return void No return value
+   */
   public function toTotalAmount()
   {
     $this->amount = $this->getMoneyIn($this->currency)->amount;
   }
 
-  public function deleteMoney(Interfaces\Money $delete, $onlybyCurrency = FALSE)
+  /**
+   * <i>Changes its state</i><br/>
+   * Deletes a money from the storage.
+   *
+   * @param \mitgedanken\Monetary\Abstracts\Money $delete
+   * @param type $onlybyCurrency Set to <i>TRUE</i> if the deletion should be
+   *        performed only via currency of $delete.
+   */
+  public function deleteMoney(Abstracts\Money $delete, $onlybyCurrency = FALSE)
   {
     if ($onlybyCurrency):
       $deleteByCurrency = $this->_findByCurrency($delete->getCurrency());
@@ -187,11 +251,25 @@ class MoneyBag extends Money implements Interfaces\MoneyBag, \Countable {
     endif;
   }
 
+  /**
+   * Replaces the <i>MoneyConverter</i> object of this MoneyBag.
+   *
+   * @param \mitgedanken\Monetary\MoneyConverter $moneyConverter
+   * @return void No return value.
+   */
   public function replaceConverter(Interfaces\MoneyConverter $converter)
   {
     $this->moneyConverter = $converter;
   }
 
+  /**
+   * Return a new Money object that represents the monetary value
+   * of this Money object, allocated according to a list of ratio's.
+   *
+   * @param array $ratios the ratio's.
+   * @param boolean $rounding [default: FALSE] rounds the result if </i>TRUE</i>
+   * @return \mitgedanken\Monetary\Abstracts\Money[] the allocated monies.
+   */
   public function allocate($ratios, $rounding = FALSE)
   {
     if (isset(static::$allocate_algo)):
@@ -234,6 +312,55 @@ class MoneyBag extends Money implements Interfaces\MoneyBag, \Countable {
     return $results;
   }
 
+  /**
+   * Adds a storage with slenderized monies and converts to Interface\Money.
+   *
+   * @param \ArrayAccess $slenderized
+   * @throws Exceptions\Exception
+   *      If a typ is not <i>SlenderMoney</i> and not <i>Abstracts\Money $</i>.
+   */
+  public function addSlenderizedStorage(\ArrayAccess $slenderized)
+  {
+    foreach ($slenderized as $value):
+      if ($value instanceof SlenderMoney):
+        $new = new Money($value->getAmount(), $value->getCurrency());
+        $this->add($new);
+      elseif ($value instanceof Abstracts\Money):
+        $this->add($value);
+      else:
+        throw new Exceptions\Exception('Ignored type: ' . \gettype($value));
+      endif;
+    endforeach;
+  }
+
+  /**
+   * Returns a storage with slenderized monies.
+   *
+   * @param \ArrayAccess $storage [nullable]
+   *        If is <i>NULL</i> the internal storage will be slenderized.
+   * @return \ArrayAccess
+   */
+  public function getSlenderizedStorage(\ArrayAccess $storage = NULL)
+  {
+    if (isset($storage)):
+      $toSlenderize = $storage;
+    else:
+      $toSlenderize = $this->storage;
+    endif;
+    $slenderized = new \SplObjectStorage();
+    foreach ($this->storage as $value):
+      if ($value instanceof Abstracts\Money):
+        $slenderized->attach(SlenderMoney::slenderize($value));
+      endif;
+    endforeach;
+    return $slenderized;
+  }
+
+  /**
+   * Return count of all monies.
+   *
+   * @return integer Count of all monies.
+   */
   public function count()
   {
     return $this->storage->count();
@@ -242,8 +369,8 @@ class MoneyBag extends Money implements Interfaces\MoneyBag, \Countable {
   /**
    * Return the money with the same currency.
    *
-   * @param \mitgedanken\Monetary\Interfaces\Money $money
-   * @return \mitgedanken\Monetary\Interfaces\Money Money with the same currency as $money.
+   * @param \mitgedanken\Monetary\Abstracts\Money $money
+   * @return \mitgedanken\Monetary\Abstracts\Money Money with the same currency as $money.
    */
   protected function _findByMoney($money)
   {
@@ -261,10 +388,10 @@ class MoneyBag extends Money implements Interfaces\MoneyBag, \Countable {
   /**
    * Return the money with the same currency.
    *
-   * @param \mitgedanken\Monetary\Interfaces\Currency $currency
-   * @return \mitgedanken\Monetary\Interfaces\Money Money with the same currency as $money.
+   * @param \mitgedanken\Monetary\Currency $currency
+   * @return \mitgedanken\Monetary\Abstracts\Money Money with the same currency as $money.
    */
-  protected function _findByCurrency(Interfaces\Currency $currency)
+  protected function _findByCurrency(Currency $currency)
   {
     $current = NULL;
     $found = FALSE;

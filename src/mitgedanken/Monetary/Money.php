@@ -14,15 +14,11 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
-
- *  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 namespace mitgedanken\Monetary;
-use mitgedanken\Monetary\NullCurrency;
-use mitgedanken\Monetary\Exceptions\InvalidArgument,
-    mitgedanken\Monetary\Exceptions\DivisionByZero,
-    mitgedanken\Monetary\Exceptions\DifferentCurrencies;
+use mitgedanken\Monetary\Exceptions\DivisionByZero;
 
 /**
  * <i>Immutable</i><br/>
@@ -30,7 +26,7 @@ use mitgedanken\Monetary\Exceptions\InvalidArgument,
  *
  * @author Sascha Tasche <sascha@mitgedanken.de>
  */
-class Money implements Interfaces\Money {
+class Money extends Abstracts\Money {
 
   /**
    * This amount.
@@ -42,7 +38,7 @@ class Money implements Interfaces\Money {
   /**
    * Holds the Currency object.
    *
-   * @var \mitgedanken\Monetary\Interfaces\Currency
+   * @var \mitgedanken\Monetary\Currency
    */
   protected $currency;
 
@@ -103,20 +99,6 @@ class Money implements Interfaces\Money {
   protected static $allocate_algo;
 
   /**
-   * Constructs this <i>Money</i> object.
-   *
-   * @param integer $amount Its amount.
-   * @param \mitgedanken\Monetary\Interfaces\Currency $currency Its currency.
-   * @throws InvalidArgument
-   */
-  public function __construct($amount, Interfaces\Currency $currency)
-  {
-    $this->_requiresIntegerOrFloat($amount, 'amount', __METHOD__);
-    $this->currency = $currency;
-    $this->amount = $amount;
-  }
-
-  /**
    * Convenience factory method.
    *
    * @example $fiveDollar = <i>Money</i>::USD(500, 'United States dollar');
@@ -124,7 +106,7 @@ class Money implements Interfaces\Money {
    *
    * @param string $name
    * @param array $arguments 0:string, currency code; 1:string, display name;
-   * @return \mitgedanken\Monetary\Interfaces\Money
+   * @return \mitgedanken\Monetary\Money
    */
   public static function __callStatic($name, $arguments)
   {
@@ -138,75 +120,39 @@ class Money implements Interfaces\Money {
     return $money;
   }
 
-  public static function zero()
-  {
-    static $zero = null;
-    if (!isset($zero)):
-      $zero = new Money(0, new NullCurrency());
-    endif;
-    return $zero;
-  }
-
-  public function getAmount()
-  {
-    return $this->amount;
-  }
-
   /**
    * Checks if this <i>Money</i> has the same amount as the other.
    * <i>The objects must have the same currency.</i></p>
    *
-   * @param \mitgedanken\Monetary\Interfaces\Money $other
+   * @param \mitgedanken\Monetary\Abstracts\Money $other
    * @return boolean <b>TRUE</b> if this monetary value has
    *                 the same amount and the same currency as the other;
    *                 <b>FALSE</b> otherwise.
    */
-  public function hasSameAmount(Interfaces\Money $other)
+  public function hasSameAmount(Abstracts\Money $other)
   {
     return $this->hasSameCurrency($other)
             && ($this->amount == $other->amount);
   }
 
-  public function getCurrency()
-  {
-    return $this->currency;
-  }
-
   /**
    * Checks if its currency is "equal to" the $currency argument.
    *
-   * @param \mitgedanken\Monetary\Interfaces\Money $other
+   * @param \mitgedanken\Monetary\Abstracts\Money $other
    * @return boolean <b>TRUE</b> if this monetary value has
    *                 the same currency as the other;
    *                 <b>FALSE</b> otherwise.
    */
-  public function hasSameCurrency(Interfaces\Money $other)
+  public function hasSameCurrency(Abstracts\Money $other)
   {
     return $this->currency->equals($other->currency);
-  }
-
-  public function add(Interfaces\Money $addend)
-  {
-    $this->_requiresSameCurrency($addend->currency, __METHOD__);
-    return $this->_newMoney($this->amount + $addend->amount, $addend);
-  }
-
-  public function subtract(Interfaces\Money $subtrahend)
-  {
-    $this->_requiresSameCurrency($subtrahend->currency, __METHOD__);
-    if ($this->isZero()):
-      $amount = $subtrahend->getAmount();
-    else:
-      $amount = $this->amount - $subtrahend->amount;
-    endif;
-    return $this->_newMoney($amount, $subtrahend);
   }
 
   /**
    * Return a new <i>Money</i> object that represents the negated monetary value
    * of this <i>Money</i> object.
    *
-   * @return \mitgedanken\Monetary\Interfaces\Money
+   * @return \mitgedanken\Monetary\Abstracts\Money
    */
   public function negate()
   {
@@ -214,32 +160,24 @@ class Money implements Interfaces\Money {
   }
 
   /**
-   * <i>Override</i></p>
-   * Return a new <i>Money</i> object that represents the monetary value
-   * of this <i>Money</i> object multiplied by a given factor.
-   *
-   * @see _multiplyAlgo
-   * @param  float|integer $multiplier
-   * @param boolean $rounding [default: TRUE] rounds the result if </i>TRUE</i>
-   * @return \mitgedanken\Monetary\Interfaces\Money
-   * @throws InvalidArgument
+   * <i>Override</i>
    */
-  public function multiply($multiplier, $rounding = TRUE)
+  public function multiply($multiplier, $rounding = FALSE)
   {
-    $multiplier = $this->_pickValue($multiplier, __METHOD__);
+    $multiplier = parent::_pickValue($multiplier, __METHOD__);
     $result = $this->_multiplyAlgo($this->amount, $multiplier, $rounding);
     return $this->_newMoney($result);
   }
 
   /**
-   * <i>Alogrithm</i></p>
+   * <i>Alogrithm</i><br/>
    * Return a new Money object that represents the monetary value
    * of this Money object multiplied by a given factor.
    *
    * @param float|integer $factor.
    * @return float product; the default algorithm Return float.
    */
-  private function _multiplyAlgo($factor1, $factor2, $rounding = TRUE)
+  private function _multiplyAlgo($factor1, $factor2, $rounding = FALSE)
   {
     if (isset(static::$multiply_algo)):
       $result = \call_user_func(
@@ -254,9 +192,12 @@ class Money implements Interfaces\Money {
     return $result;
   }
 
-  public function divide($divisor, $rounding = TRUE)
+  /**
+   * <i>Override</i>
+   */
+  public function divide($divisor, $rounding = FALSE)
   {
-    $divisor = $this->_pickValue($divisor, __METHOD__);
+    $divisor = parent::_pickValue($divisor, __METHOD__);
     if ($divisor == 0):
       throw new DivisionByZero();
     else:
@@ -266,7 +207,7 @@ class Money implements Interfaces\Money {
   }
 
   /**
-   * <i>Alogrithm</i></p>
+   * <i>Alogrithm</i><br/>
    * Divides its amount by a given divisor.
    *
    * @param float|integer $divisor
@@ -274,12 +215,8 @@ class Money implements Interfaces\Money {
    * @return float quotient.
    * @throws DivisionByZero
    */
-  private function _divideAlgo($numerand, $divisor, $rounding = TRUE)
+  private function _divideAlgo($numerand, $divisor, $rounding = FALSE)
   {
-    if ($divisor == 0):
-      throw new DivisionByZero();
-    endif;
-
     if ($numerand == $divisor):
       $result = 1;
     elseif (0 == $numerand):
@@ -299,7 +236,7 @@ class Money implements Interfaces\Money {
   }
 
   /**
-   * <i>Alogrithm</i></p>
+   * <i>Alogrithm</i><br/>
    * Rounds the result. It calls the user's rounding algorithm or it use
    * the PHP function <i>\round</i></p>.
    *
@@ -323,51 +260,6 @@ class Money implements Interfaces\Money {
       $rounded = $input;
     endif;
     return $rounded;
-  }
-
-  public function compare(Interfaces\Money $other)
-  {
-    $this->_requiresSameCurrency($other->currency, __METHOD__);
-    if ($this->amount == $other->amount):
-      $compared = 0;
-    else:
-      $compared = ($this->amount < $other->amount) ? -1 : 1;
-    endif;
-    return $compared;
-  }
-
-  public function greaterThan(Interfaces\Money $other)
-  {
-    return 1 == $this->compare($other);
-  }
-
-  public function lessThan(Interfaces\Money $other)
-  {
-    return -1 == $this->compare($other);
-  }
-
-  public function isZero()
-  {
-    return 0 == $this->amount;
-  }
-
-  public function isPositive()
-  {
-    return 0 < $this->amount;
-  }
-
-  public function isNegative()
-  {
-    return 0 > $this->amount;
-  }
-
-  public function equals($object)
-  {
-    $equals = FALSE;
-    if ($object instanceof Interfaces\Money):
-      $equals = $this->hasSameAmount($object);
-    endif;
-    return $equals;
   }
 
   /**
@@ -428,48 +320,7 @@ class Money implements Interfaces\Money {
   }
 
   /**
-   * Validates an argument.
-   *
-   * @param integer|float $argument argument to validate.
-   * @param string $name argument as string.
-   * @param string $method method name which uses this function.
-   * @throws InvalidArgument
-   */
-  protected function _requiresIntegerOrFloat($argument, $name, $method)
-  {
-    if (!\is_int($argument) && !\is_float($argument)):
-      $type = \gettype($argument);
-      $message = "Integer or float required for $name
-        (but was $type; in $method)";
-      throw new InvalidArgument($message);
-    endif;
-  }
-
-  /**
-   * Checks if the this <i>Money</i> object has the same Currency as the other.
-   *
-   * @param \mitgedanken\Monetary\Interfaces\Money $other
-   * @param boolean $throw if
-   * @return boolean <b>TRUE</b> if all requirement are met.
-   * @throws DifferentCurrencies
-   */
-  protected function _requiresSameCurrency(Interfaces\Currency $other, $method)
-  {
-    if (!$this->currency->equals($other)):
-      $message = "The same currency is required
-        (expected: $this->currency; but was $other; in: $method)";
-      throw new DifferentCurrencies($message);
-    endif;
-    return TRUE;
-  }
-
-  /**
-   * Constructs a new <i>Money</i> object with the same currency as this object.
-   *
-   * @param integer $amount
-   * @param \mitgedanken\Monetary\Interfaces\Money $other
-   * @return \mitgedanken\Monetary\Interfaces\Money
-   * @throws InvalidArgument
+   * <i>Implemented</i>
    */
   protected function _newMoney($amount, $other = NULL)
   {
@@ -479,56 +330,5 @@ class Money implements Interfaces\Money {
       $newMoney = new Money($amount, $this->currency);
     endif;
     return $newMoney;
-  }
-
-  /**
-   * Return an integer of <i>$given</i>. If it is a <i><i>Money</i></i>,
-   * it Return its amount, only if it is Zero;
-   * if it is an <i>integer</i>, it Return its value.
-   *
-   * @param integer|\mitgedanken\Monetary\Interfaces\Money $given
-   *                               Amount of <i><i>Money</i></i> or integer value.
-   * @return integer amount of Money or the given integer value.
-   * @throws InvalidArgument
-   */
-  protected function _pickValue($given, $method = NULL)
-  {
-    if ($given instanceof Money):
-      $method = (isset($method)) ? __METHOD__ : $method;
-      $this->_requiresSameCurrency($given->currency, $method);
-      $value = $given->getAmount();
-    else:
-      $this->_requiresIntegerOrFloat($given, '$denominator', $method);
-      $value = $given;
-    endif;
-    return $value;
-  }
-
-  /**
-   * Return the Currency object of the other object, if amount is 0.
-   *
-   * @return \mitgedanken\Monetary\Interfaces\Currency <i>The Currency object of the other object</i>,
-   *                            if amount is 0;
-   *                            <i>This Currency object</i></p> otherwise.
-   */
-  protected function _pickCurrency(Interfaces\Money $other)
-  {
-    return ($this->amount == 0) ? $other->currency : $this->currency;
-  }
-
-  public function identify()
-  {
-    return "$this->amount $this->currency";
-  }
-
-  /**
-   * Return this <i>Money</i> object as a string.
-   *
-   * @return string ("amount" "currency")
-   * @see \mitgedanken\Monetary\Interfaces\Currency
-   */
-  public function __toString()
-  {
-    return "$this->amount $this->currency";
   }
 }

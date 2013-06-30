@@ -24,27 +24,27 @@ namespace mitgedanken\Monetary;
  *
  * @author Sascha Tasche <sascha@mitgedanken.de>
  */
-class CurrencyPair implements Interfaces\CurrencyPair {
-
+class CurrencyPair {
+  use Traits\Monetary;
   /**
    * Its base currency.
    *
-   * @var \mitgedanken\Monetary\Interfaces\Currency
+   * @var \mitgedanken\Monetary\Currency
    */
   protected $baseCurrency;
 
   /**
    * Its counter currency.
    *
-   * @var \mitgedanken\Monetary\Interfaces\Currency
+   * @var \mitgedanken\Monetary\Currency
    */
   protected $counterCurrency;
 
   /**
    * Constructs this currency pair with a base currency and a counter currency.
    *
-   * @param \mitgedanken\Monetary\Interfaces\Currency $baseCurrency
-   * @param \mitgedanken\Monetary\Interfaces\Currency $counterCurrency
+   * @param \mitgedanken\Monetary\Currency $baseCurrency
+   * @param \mitgedanken\Monetary\Currency $counterCurrency
    */
   public function __construct(Currency $baseCurrency, Currency $counterCurrency)
   {
@@ -52,12 +52,50 @@ class CurrencyPair implements Interfaces\CurrencyPair {
     $this->counterCurrency = $counterCurrency;
   }
 
-  public function has(Interfaces\Currency $currency)
+  /**
+   * Return its base currency.
+   *
+   * @return \mitgedanken\Monetary\Currency
+   */
+  public function getBaseCurrency()
+  {
+    return $this->baseCurrency;
+  }
+
+  /**
+   * Return its counter currency.
+   *
+   * @return \mitgedanken\Monetary\Currency
+   */
+  public function getCounterCurrency()
+  {
+    return $this->counterCurrency;
+  }
+
+  /**
+   * Checks whether this pair has the given currency.<br/>
+   * This is <i>TRUE</i> if its base currency or its counter currency is
+   * "equal to" the given currency.
+   *
+   * @param \mitgedanken\Monetary\Currency $currency The given curreny to check against.
+   * @return boolean
+   */
+  public function has(Currency $currency)
   {
     return $this->baseCurrency->equals($currency)
             || $this->counterCurrency->equals($currency);
   }
 
+  /**
+   * Indicates whether this object is "equal to" another.</br>
+   * This object is "equal to" another if that is an instance of <i>CurrencyPair</i>
+   * and if the base currency is "equal to" the other's base currency or counter
+   * currency and if its counter currency is "equal to" other's counter
+   * currency or base currency.
+   *
+   * @param \mitgedanken\Monetary\CurrencyPair $object
+   * @return boolean
+   */
   public function equals($object)
   {
     $isEqual = FALSE;
@@ -70,6 +108,11 @@ class CurrencyPair implements Interfaces\CurrencyPair {
     return $isEqual;
   }
 
+  /**
+   * Return its identifier.
+   *
+   * @return string
+   */
   public function identify()
   {
     return "$this->baseCurrency $this->counterCurrency";

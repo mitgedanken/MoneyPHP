@@ -17,52 +17,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace mitgedanken\Monetary;
+namespace mitgedanken\Monetary\Traits;
 
 /**
- * NullObject for ICurrency.
+ * Description of Component
+ *
+ * @author Sascha Tasche <sascha@mitgedanken.de>
  */
-class NullCurrency extends Currency {
+trait Monetary {
 
   /**
-   * <i>Override</i>
-   */
-  public function __construct($code = '', $name = '')
-  {
-
-  }
-
-  /**
-   * <i>Override</i>
-   *
-   * @param string $name [unused]
-   * @param array $arguments [unused]
-   * @return \mitgedanken\Monetary\NullCurrency
-   */
-  public static function __callStatic($name = NULL, $arguments = NULL)
-  {
-    return new NullCurrency();
-  }
-
-  /** <i>Override</i> */
-  public function getCode()
-  {
-    return NULL;
-  }
-
-  /** <i>Override</i> */
-  public function getName()
-  {
-    return NULL;
-  }
-
-  /** <i>Override</i>
+   * Indicates whether this object is "equal to" another.</br>
+   * This object is "equal to" another if they are t he same object.
    *
    * @param mixed $object
+   * @return boolean
+   *    <i>TRUE</i> if this object is "equal to" parameter $object;
+   *    <i>FALSE</i> otherwise.
    */
   public function equals($object)
   {
-    return ($object instanceof Currency);
+    return \is_object($object) && $this === $object;
   }
 
+  /**
+   * Return its identifier.
+   *
+   * @return string
+   */
+  public function identify()
+  {
+    return get_called_class();
+  }
 }

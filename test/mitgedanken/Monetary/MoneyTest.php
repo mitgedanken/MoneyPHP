@@ -40,8 +40,6 @@ class MoneyTest extends PHPUnit_Framework_TestCase {
    */
   public function isZero()
   {
-    $this->assertTrue(Money::zero()->isZero());
-
     $money = new Money(0, new Currency('EUR'));
     $this->assertTrue($money->isZero());
 
@@ -81,9 +79,6 @@ class MoneyTest extends PHPUnit_Framework_TestCase {
 
     $this->assertFalse($this->eur->hasSameCurrency($other));
     $this->assertFalse($other->hasSameCurrency($this->eur));
-
-    $other = Money::zero();
-    $this->assertTrue($this->eur->hasSameCurrency($other));
   }
 
   /**
@@ -229,43 +224,6 @@ class MoneyTest extends PHPUnit_Framework_TestCase {
     $other = new Money($this->amount + 10, new Currency('EUR'));
     $this->assertTrue($this->eur->lessThan($other));
     $this->assertFalse($other->lessThan($this->eur));
-  }
-
-  /**
-   * @test
-   * @covers mitgedanken\Monetary\Money::isZero
-   * @depends equals
-   * @depends add
-   * @depends subtract
-   * @depends divide
-   * @depends multiply
-   */
-  public function zeroTest()
-  {
-    $this->assertSame(Money::zero(), Money::zero(),
-                      'Creating zero objects should always return the same instance.');
-
-    $this->assertEquals(Money::zero(), Money::zero());
-    $this->assertEquals(new Money(0, new NullCurrency()), Money::zero());
-    $this->assertEquals(Money::zero(), new Money(0, new NullCurrency()));
-
-// equals()
-    $this->assertTrue(Money::zero()->equals(Money::zero()));
-    $this->assertTrue(Money::zero()->equals(Money::USD(0)));
-    $this->assertTrue(Money::USD(0)->equals(Money::zero()));
-    $this->assertFalse(Money::USD(0)->equals(Money::EUR(0)));
-
-// add()
-    $this->assertEquals(Money::EUR(5), Money::EUR(5)->add(Money::zero()));
-
-// subtract()
-    $this->assertEquals(Money::EUR(5), Money::EUR(5)->subtract(Money::zero()));
-
-// multiply()
-    $this->assertEquals(Money::EUR(0), Money::EUR(5)->multiply(Money::zero()));
-
-// divide()
-    $this->assertEquals(Money::EUR(0), Money::EUR(0)->divide(Money::EUR(5)));
   }
 
   /**
