@@ -1,7 +1,15 @@
 CHANGE LOG
 ==========
 
-13.26.0-alpha
+13.26.1-alpha
+-------------
+maximum-stability: dev
+
+* Changes
+ -
+
+
+13.30.0-alpha
 -------------
 maximum-stability: dev
 
@@ -12,7 +20,7 @@ maximum-stability: dev
 
 * Refactorings
  - Interfaces\Money refactored to Abstracts\Money
- - Money refactored (angepasst)
+ - Money refactored (adapted)
 
 * New classes
  - CurrencyPairRepository

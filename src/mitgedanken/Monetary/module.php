@@ -34,9 +34,9 @@ class module_monetary {
   {
     return [
         'name' => 'MoneyPHP',
-        'id' => 'mitgedanken::MoneyPHP(Monetary)$13.26.0-alpha',
+        'id' => 'mitgedanken::MoneyPHP(Monetary)$13.30.0-alpha',
         'desc' => 'A monetary value object based on Money by Martin Fowler.',
-        'version' => '13.26.0-alpha',
+        'version' => '13.30.0-alpha',
         'min_stability' => 'dev',
         'require' => [],
         'forks' => '',

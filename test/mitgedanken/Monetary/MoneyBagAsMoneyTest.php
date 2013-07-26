@@ -175,8 +175,7 @@ class MoneyBagAsMoneyTest extends PHPUnit_Framework_TestCase {
    */
   public function addDifferentCurrencies()
   {
-    $other = new Money(1, new Currency('USD'));
-    $this->eur->add($other, FALSE, TRUE);
+    $this->eur->add(new Money(1, new Currency('USD')), FALSE, TRUE);
   }
 
   /**

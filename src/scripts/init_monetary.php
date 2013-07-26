@@ -10,7 +10,7 @@ if (!defined('MODULE_AUTOLOAD')):
   spl_autoload_register(
           function($c)
           {
-            require_once preg_replace('#\\\|_(?!.*\\\)#', '/', $c) . '.php';
+            include_once preg_replace('#\\\|_(?!.*\\\)#', '/', $c) . '.php';
           }
   );
 endif;

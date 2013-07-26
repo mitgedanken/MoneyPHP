@@ -54,7 +54,11 @@ abstract class Money {
    */
   public function __construct($amount, Currency $currency)
   {
-    $this->_requiresIntegerOrFloat($amount, 'amount', __METHOD__);
+    if (!\is_int($amount)):
+      $type = \gettype($amount);
+      $message = "Argument 1 requires integer, but was $type";
+      throw new InvalidArgument($message);
+    endif;
     $this->currency = $currency;
     $this->amount = $amount;
   }
@@ -102,7 +106,11 @@ abstract class Money {
    */
   public function add(Money $addend, $rounding = FALSE)
   {
-    $this->_requiresSameCurrency($addend->currency, __METHOD__);
+    if (!$this->currency->equals($addend->currency)):
+      $message = "The same currency is required
+        (expected: $this->currency; but was $addend->currency)";
+      throw new DifferentCurrencies($message);
+    endif;
     $result = $this->amount + $addend->amount;
     if ($rounding):
       $result = \round($result, 4, PHP_ROUND_HALF_EVEN);
@@ -122,7 +130,11 @@ abstract class Money {
    */
   public function subtract(Money $subtrahend, $rounding = FALSE)
   {
-    $this->_requiresSameCurrency($subtrahend->currency, __METHOD__);
+    if (!$this->currency->equals($subtrahend->currency)):
+      $message = "The same currency is required
+        (expected: $this->currency; but was $subtrahend->currency)";
+      throw new DifferentCurrencies($message);
+    endif;
     if ($this->isZero()):
       $result = $subtrahend->amount;
     else:
@@ -190,7 +202,11 @@ abstract class Money {
    */
   public function compare(Money $other)
   {
-    $this->_requiresSameCurrency($other->currency, __METHOD__);
+    if (!$this->currency->equals($other->currency)):
+      $message = "The same currency is required
+        (expected: $this->currency; but was $other->currency)";
+      throw new DifferentCurrencies($message);
+    endif;
     if ($this->amount == $other->amount):
       $compared = 0;
     else:
@@ -260,42 +276,6 @@ abstract class Money {
   }
 
   /**
-   * Validates an argument.
-   *
-   * @param integer|float $argument argument to validate.
-   * @param string $name argument as string.
-   * @param string $method method name which uses this function.
-   * @throws InvalidArgument
-   */
-  protected function _requiresIntegerOrFloat($argument, $name, $method)
-  {
-    if (!\is_int($argument) && !\is_float($argument)):
-      $type = \gettype($argument);
-      $message = "Integer or float required for $name
-        (but was $type; in $method)";
-      throw new InvalidArgument($message);
-    endif;
-  }
-
-  /**
-   * Checks if the this <i>Money</i> object has the same Currency as the other.
-   *
-   * @param \mitgedanken\Monetary\Money $other
-   * @param boolean $throw if
-   * @return boolean <b>TRUE</b> if all requirement are met.
-   * @throws DifferentCurrencies
-   */
-  protected function _requiresSameCurrency(Currency $other, $method)
-  {
-    if (!$this->currency->equals($other)):
-      $message = "The same currency is required
-        (expected: $this->currency; but was $other; in: $method)";
-      throw new DifferentCurrencies($message);
-    endif;
-    return TRUE;
-  }
-
-  /**
    * Constructs a new <i>Money</i> object with the same currency as this object.
    *
    * @param integer $amount
@@ -318,11 +298,19 @@ abstract class Money {
   protected function _pickValue($given, $method = NULL)
   {
     if ($given instanceof Money):
+      if (!$this->currency->equals($given->currency)):
+        $message = "The same currency is required
+        (expected: $this->currency; but was $given->currency)";
+        throw new DifferentCurrencies($message);
+      endif;
       $method = (isset($method)) ? __METHOD__ : $method;
-      $this->_requiresSameCurrency($given->currency, $method);
-      $value = $given->getAmount();
+      $value = $given->amount;
     else:
-      $this->_requiresIntegerOrFloat($given, '$denominator', $method);
+      if (!\is_int($given)):
+        $type = \gettype($given);
+        $message = "Argument 1 requires integer, but was $type";
+        throw new InvalidArgument($message);
+      endif;
       $value = $given;
     endif;
     return $value;

@@ -39,8 +39,8 @@ trait ComponentBuiltIn {
       $info['id'] = get_called_class();
       $info['module'] = 'mitgedanken\Monetary';
       $info['__built_in'] = TRUE;
-      $info['version'] = '13.26.0-alpha';
-      $info['min_version'] = '13.26.0-alpha';
+      $info['version'] = '13.30.0-alpha';
+      $info['min_version'] = '13.30.0-alpha';
       $info['maintainer'] = 'Sascha Tasche';
       $info['authors'] = [];
       $info['website'] = '';

@@ -138,7 +138,11 @@ class MoneyBag extends Money implements \Countable {
                       $compatMode = FALSE)
   {
     if ($compatMode):
-      parent::_requiresSameCurrency($addend->getCurrency(), __METHOD__);
+      if (!$this->currency->equals($addend->currency)):
+        $message = "The same currency is required
+        (expected: $this->currency; but was $addend->currency)";
+        throw new DifferentCurrencies($message);
+      endif;
     endif;
 
     if ($addend instanceof MoneyBag):

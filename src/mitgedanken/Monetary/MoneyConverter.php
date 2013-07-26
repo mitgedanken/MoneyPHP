@@ -30,6 +30,8 @@ class MoneyConverter {
   use Traits\Monetary;
   /**
    * Holds the exchange rates.
+   *
+   * @var \SplObjectStorage
    */
   protected $storage;
 
@@ -58,7 +60,7 @@ class MoneyConverter {
                               $noSuitableException = FALSE)
   {
     $this->noSuitableException = $noSuitableException;
-    if (isset($storage)):
+    if (\is_object($storage)):
       $this->storage = $storage;
     else:
       $this->storage = new \SplObjectStorage();
@@ -66,8 +68,8 @@ class MoneyConverter {
   }
 
   /**
-   * Set if a <i>NoSuitableExchangeRate</i> exception is thrown if no suitable
-   * exchange rate was found.
+   * Set whether a <i>NoSuitableExchangeRate</i> exception must be thrown if no
+   * suitable exchange rate was found.
    *
    * @param boolean $boolean
    */
@@ -146,6 +148,9 @@ class MoneyConverter {
       endwhile;
     endif;
     if ($found):
+      if (0 == $ratios[0]):
+        throw new Exceptions\DivisionByZero();
+      endif;
       $exchangeResult = $money->multiply($ratios[1])->divide($ratios[0]);
       $result = new Money($exchangeResult->getAmount(), $toCurrency);
     else:
@@ -165,23 +170,31 @@ class MoneyConverter {
    */
   public function equals($object)
   {
-
+    $isEqual = FALSE;
+    if ($object instanceof MoneyConverter):
+      $isEqual = $this->storage == $object->storage;
+    endif;
+    return $isEqual;
   }
 
   /**
    * Return its identifier.<br/>
-   * Exchange rates are identifiable by its class name.
+   * Exchange rates are identifiable by its storage.
    *
    * @return string Its identifier.
    */
   public function identify()
   {
-    return __CLASS__;
+    return serialize($this->storage);
   }
 
   public function __toString()
   {
-    return __CLASS__;
+    $result = '';
+    foreach ($this->storage as $money):
+      $result .= '' . $money . "\n";
+    endforeach;
+    return $result;
   }
 
   /**

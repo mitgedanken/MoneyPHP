@@ -101,21 +101,21 @@ class Money extends Abstracts\Money {
   /**
    * Convenience factory method.
    *
-   * @example $fiveDollar = <i>Money</i>::USD(500, 'United States dollar');
+   * @example $fiveDollar = <i>Money</i>::USD(500, 'United States Dollar');
    * @example $fiveDollar = <i>Money</i>::USD(500);
    *
-   * @param string $name
+   * @param string $code
    * @param array $arguments 0:string, currency code; 1:string, display name;
    * @return \mitgedanken\Monetary\Money
    */
-  public static function __callStatic($name, $arguments)
+  public static function __callStatic($code, $arguments)
   {
     $cargs = \count($arguments);
     if (2 == $cargs):
       $money = new Money(
-              $arguments[0], new Currency($name, $arguments[1]));
+              $arguments[0], new Currency($code, $arguments[1]));
     else:
-      $money = new Money($arguments[0], new Currency($name));
+      $money = new Money($arguments[0], new Currency($code));
     endif;
     return $money;
   }
@@ -319,9 +319,6 @@ class Money extends Abstracts\Money {
     static::$divide_algo = $algo;
   }
 
-  /**
-   * <i>Implemented</i>
-   */
   protected function _newMoney($amount, $other = NULL)
   {
     if (isset($other)):
