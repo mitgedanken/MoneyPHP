@@ -216,3 +216,36 @@ pip-log.txt
 /src/DisplayLocales.php
 /src/mitgedanken/Monetary/Util/
 /src/mitgedanken/Monetary/Error/
+
+# Created by http://gitignore.io
+
+### Windows ###
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+### NetBeans ###
+nbproject/
+build/
+nbbuild/
+dist/
+nbdist/
+nbactions.xml
+nb-configuration.xml
+build.xml
+build.properties
+
+
+### Java ###
+*.class
+
+# Package Files #
+*.jar
+*.war
+*.ear
