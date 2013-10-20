@@ -10,22 +10,26 @@ class MoneyBagTest extends \PHPUnit_Framework_TestCase {
   protected $object;
 
   /**
+   *
+   * @var CurrencyPairRepository
+   */
+  protected $repository;
+
+  /**
    * Sets up the fixture, for example, opens a network connection.
    * This method is called before a test is executed.
    */
-  protected function setUp()
-  {
-    $moneyConverter = new MoneyConverter();
-    $pair = new CurrencyPair(new Currency('USD'), new Currency('EUR'));
-    $moneyConverter->attach($pair, array(0 => 2, 1 => 3));
-    $this->object = new MoneyBag(0, new Currency('EUR'), $moneyConverter);
+  protected function setUp() {
+    $pair             = new CurrencyPair(new Currency('USD'), new Currency('EUR'), 1);
+    $this->object     = new MoneyBag(0, new Currency('EUR'));
+    $this->repository = new CurrencyPairRepository();
+    $this->repository->attach($pair);
   }
 
   /**
    * @test
    */
-  public function implementsCountable()
-  {
+  public function implementsCountable() {
     $this->assertTrue(\is_a($this->object, 'Countable'));
   }
 
@@ -33,10 +37,8 @@ class MoneyBagTest extends \PHPUnit_Framework_TestCase {
    * @test
    * @covers mitgedanken\Monetary\MoneyBag::addMoney
    */
-  public function addMoney()
-  {
+  public function addMoney1() {
     $this->assertEquals(1, $this->object->count());
-
 
     $addend = new Money(0, new Currency('EUR'));
     $this->object->addMoney($addend);
@@ -65,25 +67,18 @@ class MoneyBagTest extends \PHPUnit_Framework_TestCase {
    * @covers mitgedanken\Monetary\MoneyBag::addMoneyBag
    * @todo   Implement testAddMoneyBag().
    */
-  public function addMoneyBag()
-  {
-    $addend = new Money(20, new Currency('USD'));
-    $this->object->addMoney($addend);
-    $bag = new MoneyBag(0, new Currency('PPP'));
-    $this->object->addMoneyBag($bag);
+  public function addMoneyBag() {
+    $this->object->addMoney(new Money(20, new Currency('USD')));
+    $this->object->addMoneyBag(new MoneyBag(0, new Currency('PPP')));
     $this->assertEquals(3, $this->object->count());
   }
 
   /**
    * @test
    */
-  public function addMoneyBag2()
-  {
-    $addend = new Money(20, new Currency('USD'));
-    $this->object->addMoney($addend);
-
-    $bag = new MoneyBag(0, new Currency('USD'));
-    $this->object->addMoneyBag($bag);
+  public function addMoney2() {
+    $this->object->addMoney(new Money(20, new Currency('USD')));
+    $this->object->addMoneyBag(new MoneyBag(1, new Currency('USD')));
     $this->assertEquals(2, $this->object->count());
   }
 
@@ -93,14 +88,11 @@ class MoneyBagTest extends \PHPUnit_Framework_TestCase {
    * @depends addMoney
    * @depends addMoneyBag
    */
-  public function add()
-  {
-    $addend = new Money(20, new Currency('USD'));
-    $this->object->add($addend);
+  public function add() {
+    $this->object->add(new Money(20, new Currency('USD')));
     $this->assertEquals(2, $this->object->count());
 
-    $bag = new MoneyBag(0, new Currency('USD'));
-    $this->object->addMoneyBag($bag);
+    $this->object->addMoneyBag(new MoneyBag(0, new Currency('USD')));
     $this->assertEquals(2, $this->object->count());
   }
 
@@ -108,32 +100,28 @@ class MoneyBagTest extends \PHPUnit_Framework_TestCase {
    * @test
    * @covers mitgedanken\Monetary\MoneyBag::getMoneyIn
    */
-  public function getMoneyIn()
-  {
+  public function getMoneyIn() {
     $addend = new Money(20, new Currency('USD'));
     $this->object->add($addend);
-    $this->assertEquals($addend, $this->object->getMoneyIn(new Currency('USD')));
+    $this->assertEquals($addend, $this->object->getMoneyIn(new Currency('EUR'), $this->repository));
   }
 
   /**
    * @test
    * @covers mitgedanken\Monetary\MoneyBag::getTotalIn
    */
-  public function getTotalIn()
-  {
-    $addend = new Money(20, new Currency('USD'));
-    $this->object->add($addend);
-    $this->assertEquals(20, $this->object->getTotalIn(new Currency('USD')));
+  public function getTotalIn() {
+    $this->object->add(new Money(20, new Currency('USD')));
+    $res = $this->object->getTotalIn(new Currency('USD'), $this->repository);
+    $this->assertEquals(20, $res);
   }
 
   /**
    * @test
    * @covers mitgedanken\Monetary\MoneyBag::getTotalOf
    */
-  public function getTotalOf()
-  {
-    $addend = new Money(20, new Currency('PPP'));
-    $this->object->add($addend);
+  public function getTotalOf() {
+    $this->object->add(new Money(20, new Currency('PPP')));
     $this->assertEquals(20, $this->object->getTotalOf(new Currency('PPP')));
   }
 
@@ -141,11 +129,10 @@ class MoneyBagTest extends \PHPUnit_Framework_TestCase {
    * @test
    * @covers mitgedanken\Monetary\MoneyBag::update
    */
-  public function toTotalAmount()
-  {
-    $addend = new Money(20, new Currency('USD'));
-    $this->object->add($addend);
-    $this->object->toTotalAmount();
-    $this->assertEquals(30, $this->object->getAmount());
+  public function toTotalAmount() {
+    $this->object->add(new Money(20, new Currency('USD')));
+    $this->object->toTotalAmount($this->repository);
+    $this->assertEquals(20, $this->object->getAmount());
   }
+
 }

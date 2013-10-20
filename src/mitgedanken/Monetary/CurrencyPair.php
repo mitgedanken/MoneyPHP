@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2013 Sascha Tasche <sascha@mitgedanken.de>
+ * Copyright (C) 2013 Sascha Tasche <hallo@mitgedanken.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ namespace mitgedanken\Monetary;
 /**
  * Description of CurrencyPair
  *
- * @author Sascha Tasche <sascha@mitgedanken.de>
+ * @author Sascha Tasche <hallo@mitgedanken.de>
  */
 class CurrencyPair {
   use Traits\Monetary;
@@ -39,21 +39,31 @@ class CurrencyPair {
    * @var \mitgedanken\Monetary\Currency
    */
   protected $counterCurrency;
+  
+  /**
+   * Its ratio.
+   * 
+   * @var integer|float
+   */
+  protected $ratio;
 
   /**
    * Constructs this currency pair with a base currency and a counter currency.
    *
    * @param \mitgedanken\Monetary\Currency $baseCurrency
    * @param \mitgedanken\Monetary\Currency $counterCurrency
+   * @param integer|float $ratio
    */
-  public function __construct(Currency $baseCurrency, Currency $counterCurrency)
+  public function __construct(Currency $baseCurrency, Currency $counterCurrency, $ratio)
   {
     $this->baseCurrency = $baseCurrency;
-    $this->counterCurrency = $counterCurrency;
+    $this->counterCurrency = $counterCurrency;    
+    $this->ratio = $ratio;
+    settype($this->ratio, 'float');
   }
 
   /**
-   * Return its base currency.
+   * Returns its base currency.
    *
    * @return \mitgedanken\Monetary\Currency
    */
@@ -63,13 +73,23 @@ class CurrencyPair {
   }
 
   /**
-   * Return its counter currency.
+   * Returns its counter currency.
    *
    * @return \mitgedanken\Monetary\Currency
    */
   public function getCounterCurrency()
   {
     return $this->counterCurrency;
+  }
+  
+  /**
+   * Returns its ratio.
+   * 
+   * @return float
+   */
+  public function getRatio()
+  {
+    return $this->ratio;
   }
 
   /**
@@ -83,7 +103,7 @@ class CurrencyPair {
   public function has(Currency $currency)
   {
     return $this->baseCurrency->equals($currency)
-            || $this->counterCurrency->equals($currency);
+          || $this->counterCurrency->equals($currency);
   }
 
   /**
@@ -120,6 +140,6 @@ class CurrencyPair {
 
   public function __toString()
   {
-    return "$this->baseCurrency $this->counterCurrency";
+    return "$this->baseCurrency $this->counterCurrency $this->ratio";
   }
 }

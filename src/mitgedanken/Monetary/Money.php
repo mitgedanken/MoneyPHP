@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2013 Sascha Tasche <sascha@mitgedanken.de>
+ * Copyright (C) 2013 Sascha Tasche <hallo@mitgedanken.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ use mitgedanken\Monetary\Exceptions\DivisionByZero;
  * <i>Immutable</i><br/>
  * An implementation of <i>Money</i>.
  *
- * @author Sascha Tasche <sascha@mitgedanken.de>
+ * @author Sascha Tasche <hallo@mitgedanken.de>
  */
 class Money extends Abstracts\Money {
 

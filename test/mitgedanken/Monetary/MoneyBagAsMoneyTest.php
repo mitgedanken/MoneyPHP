@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2013 Sascha Tasche <sascha@mitgedanken.de>
+ * Copyright (C) 2013 Sascha Tasche <hallo@mitgedanken.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,10 +19,11 @@
 /**
  * Description of MoneyBagAsMoneyTest
  *
- * @author Sascha Tasche <sascha@mitgedanken.de>
+ * @author Sascha Tasche <hallo@mitgedanken.de>
  */
 
 namespace mitgedanken\Monetary;
+
 use PHPUnit_Framework_TestCase;
 use mitgedanken\Monetary\Money,
     mitgedanken\Monetary\Currency;
@@ -38,22 +39,20 @@ class MoneyBagAsMoneyTest extends PHPUnit_Framework_TestCase {
   /** @var mitgedanken\Monetary\Money */
   protected $eur;
 
-  protected function setUp()
-  {
+  protected function setUp() {
     $usdc = new Currency('USD');
     $eurc = new Currency('EUR');
 
     $this->amount = 20;
-    $this->usd = new MoneyBag($this->amount, $usdc);
-    $this->eur = new MoneyBag($this->amount, $eurc);
+    $this->usd    = new MoneyBag($this->amount, $usdc);
+    $this->eur    = new MoneyBag($this->amount, $eurc);
   }
 
   /**
    * @test
    * @covers mitgedanken\Monetary\Money::__callStatic
    */
-  public function callStatic()
-  {
+  public function callStatic() {
     $usd = new Money($this->amount, new Currency('USD'));
     $eur = new Money($this->amount, new Currency('EUR'));
     $this->assertEquals($eur, Money::EUR($this->amount));
@@ -65,8 +64,7 @@ class MoneyBagAsMoneyTest extends PHPUnit_Framework_TestCase {
    * @covers mitgedanken\Monetary\Money::isZero
    * @depends callStatic
    */
-  public function isZero()
-  {
+  public function isZero() {
     $money = new Money(0, new Currency('EUR'));
     $this->assertTrue($money->isZero());
 
@@ -77,8 +75,7 @@ class MoneyBagAsMoneyTest extends PHPUnit_Framework_TestCase {
    * @test
    * @covers mitgedanken\Monetary\Money::isPositive
    */
-  public function isPositive()
-  {
+  public function isPositive() {
     $other = new Money(1, new Currency('USD'));
     $this->assertTrue($other->isPositive());
   }
@@ -87,8 +84,7 @@ class MoneyBagAsMoneyTest extends PHPUnit_Framework_TestCase {
    * @test
    * @covers mitgedanken\Monetary\Money::isNegative
    */
-  public function isNegative()
-  {
+  public function isNegative() {
     $other = new Money(-1, new Currency('USD'));
     $this->assertTrue($other->isNegative());
   }
@@ -98,8 +94,7 @@ class MoneyBagAsMoneyTest extends PHPUnit_Framework_TestCase {
    * @covers mitgedanken\Monetary\Money::hasSameCurrency
    * @depends isZero
    */
-  public function hasSameCurrency()
-  {
+  public function hasSameCurrency() {
     $other = new Money(1, new Currency('USD'));
     $this->assertTrue($this->usd->hasSameCurrency($other));
     $this->assertTrue($other->hasSameCurrency($this->usd));
@@ -113,8 +108,7 @@ class MoneyBagAsMoneyTest extends PHPUnit_Framework_TestCase {
    * @covers mitgedanken\Monetary\Money::hasSameAmount
    * @depends hasSameCurrency
    */
-  public function hasSameAmount()
-  {
+  public function hasSameAmount() {
     $other = new Money($this->amount, new Currency('USD'));
     $this->assertTrue($this->usd->hasSameAmount($other));
 
@@ -126,8 +120,7 @@ class MoneyBagAsMoneyTest extends PHPUnit_Framework_TestCase {
    * @test
    * @covers mitgedanken\Monetary\Money::equals
    */
-  public function equals()
-  {
+  public function equals() {
     $this->assertTrue($this->usd->equals($this->usd));
     $this->assertFalse($this->usd->equals($this->eur));
 
@@ -147,8 +140,7 @@ class MoneyBagAsMoneyTest extends PHPUnit_Framework_TestCase {
    * @test
    * @covers mitgedanken\Monetary\Money::getAmount
    */
-  public function getters()
-  {
+  public function getters() {
     $this->assertEquals($this->amount, $this->usd->getAmount());
 
     $expected = new Currency('USD');
@@ -160,10 +152,9 @@ class MoneyBagAsMoneyTest extends PHPUnit_Framework_TestCase {
    * @test
    * @covers mitgedanken\Monetary\Money::add
    */
-  public function add()
-  {
+  public function add() {
     $currency = new Currency('EUR');
-    $other = new Money(1, $currency);
+    $other    = new Money(1, $currency);
     $expected = new Money($this->amount + 1, $currency);
     $this->assertEquals($expected, $this->eur->add($other));
   }
@@ -173,8 +164,7 @@ class MoneyBagAsMoneyTest extends PHPUnit_Framework_TestCase {
    * @covers mitgedanken\Monetary\Money::add
    * @expectedException \mitgedanken\Monetary\Exceptions\DifferentCurrencies
    */
-  public function addDifferentCurrencies()
-  {
+  public function addDifferentCurrencies() {
     $this->eur->add(new Money(1, new Currency('USD')), FALSE, TRUE);
   }
 
@@ -182,11 +172,9 @@ class MoneyBagAsMoneyTest extends PHPUnit_Framework_TestCase {
    * @test
    * @covers mitgedanken\Monetary\Money::subtract
    */
-  public function subtract()
-  {
-    $currency = new Currency('EUR');
-    $other = new Money(1, $currency);
-    $expected = new Money($this->amount - 1, $currency);
+  public function subtract() {
+    $other    = new Money(1, new Currency('EUR'));
+    $expected = new Money($this->amount - 1, new Currency('EUR'));
     $this->assertEquals($expected, $this->eur->subtract($other));
   }
 
@@ -195,8 +183,7 @@ class MoneyBagAsMoneyTest extends PHPUnit_Framework_TestCase {
    * @covers mitgedanken\Monetary\Money::subtract
    * @expectedException \mitgedanken\Monetary\Exceptions\DifferentCurrencies
    */
-  public function subtractDifferentCurrencies()
-  {
+  public function subtractDifferentCurrencies() {
     $other = new Money(1, new Currency('USD'));
     $this->eur->subtract($other);
   }
@@ -205,8 +192,7 @@ class MoneyBagAsMoneyTest extends PHPUnit_Framework_TestCase {
    * @test
    * @covers mitgedanken\Monetary\Money::negate
    */
-  public function negate()
-  {
+  public function negate() {
     $expected = new Money(-$this->amount, new Currency('USD'));
     $this->assertEquals($expected, $this->usd->negate());
   }
@@ -215,10 +201,9 @@ class MoneyBagAsMoneyTest extends PHPUnit_Framework_TestCase {
    * @test
    * @covers mitgedanken\Monetary\Money::multiply
    */
-  public function multiply()
-  {
+  public function multiply() {
     $multiplier = 2;
-    $expected = new Money($this->amount * 2, new Currency('EUR'));
+    $expected   = new Money($this->amount * 2, new Currency('EUR'));
     $this->assertEquals($expected, $this->eur->multiply($multiplier));
   }
 
@@ -227,8 +212,7 @@ class MoneyBagAsMoneyTest extends PHPUnit_Framework_TestCase {
    * @covers mitgedanken\Monetary\Money::multiply
    * @expectedException \mitgedanken\Monetary\Exceptions\DifferentCurrencies
    */
-  public function multiplyDifferentCurrencies()
-  {
+  public function multiplyDifferentCurrencies() {
     $this->eur->multiply($this->usd);
   }
 
@@ -236,8 +220,7 @@ class MoneyBagAsMoneyTest extends PHPUnit_Framework_TestCase {
    * @test
    * @covers mitgedanken\Monetary\Money::divide
    */
-  public function divide()
-  {
+  public function divide() {
     $expected = new Money(1, new Currency('EUR'));
     $this->assertEquals($expected, $this->eur->divide($this->amount));
   }
@@ -247,8 +230,7 @@ class MoneyBagAsMoneyTest extends PHPUnit_Framework_TestCase {
    * @covers mitgedanken\Monetary\Money::divide
    * @expectedException mitgedanken\Monetary\Exceptions\DivisionByZero
    */
-  public function divisionByZero()
-  {
+  public function divisionByZero() {
     $this->eur->divide(0);
   }
 
@@ -256,11 +238,10 @@ class MoneyBagAsMoneyTest extends PHPUnit_Framework_TestCase {
    * @test
    * @covers mitgedanken\Monetary\Money::compare
    */
-  public function compare()
-  {
+  public function compare() {
     $currency = new Currency('USD');
-    $money1 = new Money(1, $currency);
-    $money2 = new Money(2, $currency);
+    $money1   = new Money(1, $currency);
+    $money2   = new Money(2, $currency);
 
     $this->assertEquals(-1, $money1->compare($money2));
     $this->assertEquals(1, $money2->compare($money1));
@@ -275,8 +256,7 @@ class MoneyBagAsMoneyTest extends PHPUnit_Framework_TestCase {
    * @covers mitgedanken\Monetary\Money::compare
    * @expectedException mitgedanken\Monetary\Exceptions\DifferentCurrencies
    */
-  public function compareException()
-  {
+  public function compareException() {
     $this->eur->compare($this->usd);
   }
 
@@ -285,8 +265,7 @@ class MoneyBagAsMoneyTest extends PHPUnit_Framework_TestCase {
    * @depends compare
    * @covers mitgedanken\Monetary\Money::greaterThan
    */
-  public function _greaterThan()
-  {
+  public function _greaterThan() {
     $other = new Money($this->amount + 10, new Currency('EUR'));
     $this->assertTrue($other->greaterThan($this->eur));
     $this->assertFalse($this->eur->greaterThan($other));
@@ -298,8 +277,7 @@ class MoneyBagAsMoneyTest extends PHPUnit_Framework_TestCase {
    * @covers mitgedanken\Monetary\Money::greaterThan
    * @expectedException mitgedanken\Monetary\Exceptions\DifferentCurrencies
    */
-  public function greaterThanDifferentCurrencies()
-  {
+  public function greaterThanDifferentCurrencies() {
     $other = new Money($this->amount + 10, new Currency('EUR'));
     $other->greaterThan($this->usd);
   }
@@ -309,8 +287,7 @@ class MoneyBagAsMoneyTest extends PHPUnit_Framework_TestCase {
    * @depends compare
    * @covers mitgedanken\Monetary\Money::lessThan
    */
-  public function _lessThan()
-  {
+  public function _lessThan() {
     $other = new Money($this->amount + 10, new Currency('EUR'));
     $this->assertTrue($this->eur->lessThan($other));
     $this->assertFalse($other->lessThan($this->eur));
@@ -322,8 +299,7 @@ class MoneyBagAsMoneyTest extends PHPUnit_Framework_TestCase {
    * @covers mitgedanken\Monetary\Money::lessThan
    * @expectedException mitgedanken\Monetary\Exceptions\DifferentCurrencies
    */
-  public function lessThanException()
-  {
+  public function lessThanException() {
     $other = new Money($this->amount + 10, new Currency('EUR'));
     $other->lessThan($this->usd);
   }
@@ -332,8 +308,8 @@ class MoneyBagAsMoneyTest extends PHPUnit_Framework_TestCase {
    * @test
    * @covers mitgedanken\Monetary\Money::__toString
    */
-  public function testToString()
-  {
+  public function testToString() {
     $this->assertEquals("$this->amount EUR ''", $this->eur);
   }
+
 }

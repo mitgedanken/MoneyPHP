@@ -40,7 +40,7 @@ class CurrencyPairRepositoryTest extends \PHPUnit_Framework_TestCase {
   {
     $usd = new Currency('USD');
     $eur = new Currency('EUR');
-    $pair = new CurrencyPair($usd, $eur);
+    $pair = new CurrencyPair($usd, $eur, 0.0);
     $this->object->attach($pair);
     $this->mock->set($usd, $eur);
     $expected = new \SplObjectStorage();

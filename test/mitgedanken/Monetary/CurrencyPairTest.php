@@ -20,18 +20,27 @@ class CurrencyPairTest extends \PHPUnit_Framework_TestCase {
   {
     $usd = new Currency('USD');
     $eur = new Currency('EUR');
-    $this->object = new CurrencyPair($usd, $eur);
+    $this->object = new CurrencyPair($usd, $eur, 0.0);
   }
-
-  /**
-   * @covers mitgedanken\Monetary\CurrencyPair::has
-   * @todo   Implement testHas().
-   */
-  public function testHas()
+  
+  public function getRatio()
   {
     $usd = new Currency('USD');
     $eur = new Currency('EUR');
-    $object = new CurrencyPair($usd, $eur);
+    $object = new CurrencyPair($usd, $eur, 1);
+    $this->assertEquals(1.0, $object->getRatio());
+  }
+
+  /**
+   * @test
+   * @covers mitgedanken\Monetary\CurrencyPair::has
+   * @todo   Implement testHas().
+   */
+  public function has()
+  {
+    $usd = new Currency('USD');
+    $eur = new Currency('EUR');
+    $object = new CurrencyPair($usd, $eur, 0.0);
     $this->assertTrue($this->object->has($usd));
     $this->assertTrue($this->object->has($eur));
 
@@ -40,25 +49,26 @@ class CurrencyPairTest extends \PHPUnit_Framework_TestCase {
   }
 
   /**
+   * @test
    * @covers mitgedanken\Monetary\CurrencyPair::equals
    * @todo   Implement testEquals().
    */
-  public function testEquals()
+  public function equals()
   {
     $usd = new Currency('USD');
     $eur = new Currency('EUR');
-    $object = new CurrencyPair($usd, $eur);
+    $object = new CurrencyPair($usd, $eur, 0.0);
     $this->assertTrue($this->object->equals($object));
 
-    $object = new CurrencyPair($eur, $usd);
+    $object = new CurrencyPair($eur, $usd, 0.0);
     $this->assertTrue($this->object->equals($object));
 
 
     $ppp = new Currency('PPP');
-    $object = new CurrencyPair($ppp, $usd);
+    $object = new CurrencyPair($ppp, $usd, 0.0);
     $this->assertFalse($this->object->equals($object));
 
-    $object = new CurrencyPair($eur, $ppp);
+    $object = new CurrencyPair($eur, $ppp, 0.0);
     $this->assertFalse($this->object->equals($object));
   }
 }

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2013 Sascha Tasche <sascha@mitgedanken.de>
+ * Copyright (C) 2013 Sascha Tasche <hallo@mitgedanken.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ namespace mitgedanken\Monetary\Interfaces;
 /**
  * Marker interface.
  *
- * @author Sascha Tasche <sascha@mitgedanken.de>
+ * @author Sascha Tasche <hallo@mitgedanken.de>
  */
 interface MonetaryStorage {
 

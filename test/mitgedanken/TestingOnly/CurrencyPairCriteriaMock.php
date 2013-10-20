@@ -5,7 +5,7 @@ namespace mitgedanken\TestingOnly;
 /**
  * CurrencyPairCriteria only for testing.
  *
- * @author Sascha Tasche <sascha@mitgedanken.de>
+ * @author Sascha Tasche <hallo@mitgedanken.de>
  */
 class CurrencyPairCriteriaMock
         implements \mitgedanken\Monetary\Interfaces\CurrencyPairCriteria {

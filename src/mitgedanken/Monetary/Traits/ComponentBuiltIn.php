@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2013 Sascha Tasche <sascha@mitgedanken.de>
+ * Copyright (C) 2013 Sascha Tasche <hallo@mitgedanken.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ namespace \mitgedanken\Monetary\Traits;
 /**
  * ComponentBuiltIn
  *
- * @author Sascha Tasche <sascha@mitgedanken.de>
+ * @author Sascha Tasche <hallo@mitgedanken.de>
  */
 trait ComponentBuiltIn {
 
@@ -39,8 +39,8 @@ trait ComponentBuiltIn {
       $info['id'] = get_called_class();
       $info['module'] = 'mitgedanken\Monetary';
       $info['__built_in'] = TRUE;
-      $info['version'] = '13.30.0-alpha';
-      $info['min_version'] = '13.30.0-alpha';
+      $info['version'] = '13.43.0-alpha';
+      $info['min_version'] = '13.43.0-alpha';
       $info['maintainer'] = 'Sascha Tasche';
       $info['authors'] = [];
       $info['website'] = '';

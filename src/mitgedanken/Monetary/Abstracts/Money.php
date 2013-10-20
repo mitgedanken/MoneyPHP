@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2013 Sascha Tasche <sascha@mitgedanken.de>
+ * Copyright (C) 2013 Sascha Tasche <hallo@mitgedanken.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
  */
 
 namespace mitgedanken\Monetary\Abstracts;
+
 use mitgedanken\Monetary\Currency;
 use mitgedanken\Monetary\Exceptions\InvalidArgument,
     mitgedanken\Monetary\Exceptions\DivisionByZero,
@@ -27,10 +28,12 @@ use mitgedanken\Monetary\Exceptions\InvalidArgument,
  * <i>Immutable</i></br>
  * This interface specifies a monetary value object based on Money by Martin Fowler.
  *
- * @author Sascha Tasche <sascha@mitgedanken.de>
+ * @author Sascha Tasche <hallo@mitgedanken.de>
  */
 abstract class Money {
+
   use \mitgedanken\Monetary\Traits\Monetary;
+
   /**
    * This amount.
    *
@@ -46,21 +49,28 @@ abstract class Money {
   protected $currency;
 
   /**
+   * Holds the scale used by all bc* functions.
+   *
+   * @var integer
+   */
+  protected $scale;
+
+  /**
    * Constructs this <i>Money</i> object.
    *
    * @param integer $amount Its amount.
    * @param \mitgedanken\Monetary\Currency $currency Its currency.
    * @throws InvalidArgument
    */
-  public function __construct($amount, Currency $currency)
-  {
-    if (!\is_int($amount)):
-      $type = \gettype($amount);
-      $message = "Argument 1 requires integer, but was $type";
+  public function __construct($amount, Currency $currency, $scale = 12) {
+    if (!\is_integer($amount) && !\is_float($amount)):
+      $type    = \gettype($amount);
+      $message = "Argument 1 requires integer or float, but was $type";
       throw new InvalidArgument($message);
     endif;
     $this->currency = $currency;
-    $this->amount = $amount;
+    $this->amount   = $amount;
+    $this->scale    = $scale;
   }
 
   /**
@@ -69,8 +79,7 @@ abstract class Money {
    *
    * @throws Exceptions\UnsupportedOperation
    */
-  public function __clone()
-  {
+  public function __clone() {
     throw new Exceptions\UnsupportedOperation('__clone not supported');
   }
 
@@ -79,8 +88,7 @@ abstract class Money {
    *
    * @return integer Its ammount.
    */
-  public function getAmount()
-  {
+  public function getAmount() {
     return $this->amount;
   }
 
@@ -89,8 +97,7 @@ abstract class Money {
    *
    * @return \mitgedanken\Monetary\Currency Its currency object.
    */
-  public function getCurrency()
-  {
+  public function getCurrency() {
     return $this->currency;
   }
 
@@ -104,14 +111,14 @@ abstract class Money {
    * @throws InvalidArgumentException
    * @throws DifferentCurrencies If $addend has a different currency.
    */
-  public function add(Money $addend, $rounding = FALSE)
-  {
+  public function add(Money $addend, $rounding = FALSE) {
     if (!$this->currency->equals($addend->currency)):
       $message = "The same currency is required
         (expected: $this->currency; but was $addend->currency)";
       throw new DifferentCurrencies($message);
     endif;
-    $result = $this->amount + $addend->amount;
+    $result = bcadd($this->amount, $addend->amount, 12);
+    settype($result, 'float');
     if ($rounding):
       $result = \round($result, 4, PHP_ROUND_HALF_EVEN);
     endif;
@@ -128,8 +135,7 @@ abstract class Money {
    * @return \mitgedanken\Monetary\Money
    * @throws InvalidArgumentException
    */
-  public function subtract(Money $subtrahend, $rounding = FALSE)
-  {
+  public function subtract(Money $subtrahend, $rounding = FALSE) {
     if (!$this->currency->equals($subtrahend->currency)):
       $message = "The same currency is required
         (expected: $this->currency; but was $subtrahend->currency)";
@@ -138,10 +144,11 @@ abstract class Money {
     if ($this->isZero()):
       $result = $subtrahend->amount;
     else:
-      $result = $this->amount - $subtrahend->amount;
+      $result = \bcsub($this->amount, $subtrahend->amount, $this->scale);
+      settype($result, 'float');
     endif;
     if ($rounding):
-      $result = \round($result, 4, PHP_ROUND_HALF_EVEN);
+      $result = \round($result, $this->scale, PHP_ROUND_HALF_EVEN);
     endif;
     return $this->_newMoney($result);
   }
@@ -156,12 +163,12 @@ abstract class Money {
    * @return \mitgedanken\Monetary\Money
    * @throws InvalidArgument
    */
-  public function multiply($multiplier, $rounding = FALSE)
-  {
+  public function multiply($multiplier, $rounding = FALSE) {
     $multiplier = $this->_pickValue($multiplier, __METHOD__);
-    $result = $this->_newMoney($this->amount * $multiplier);
+    $result     = $this->_newMoney(bcmul($this->amount, $multiplier, $this->scale));
+    settype($result, 'float');
     if ($rounding):
-      $result = \round($result, 4, PHP_ROUND_HALF_EVEN);
+      $result = \round($result, $this->scale, PHP_ROUND_HALF_EVEN);
     endif;
     return $result;
   }
@@ -176,15 +183,16 @@ abstract class Money {
    * @throws InvalidArgumentException
    * @throws DivisionByZero
    */
-  public function divide($divisor, $rounding = FALSE)
-  {
+  public function divide($divisor, $rounding = FALSE) {
     $divisor = $this->_pickValue($divisor, __METHOD__);
     if ($divisor == 0):
-      throw new DivisionByZero;
+      throw new DivisionByZero();
     else:
+      $result = bcdiv($this->amount, $divisor, $this->scale);
       if ($rounding):
-        $result = \round($result, 4, PHP_ROUND_HALF_EVEN);
+        $result = \round($result, $this->scale, PHP_ROUND_HALF_EVEN);
       endif;
+      settype($result, 'float');
       return $result;
     endif;
   }
@@ -200,8 +208,7 @@ abstract class Money {
    *    1 if the other amount is less.
    * @throws InvalidArgumentException
    */
-  public function compare(Money $other)
-  {
+  public function compare(Money $other) {
     if (!$this->currency->equals($other->currency)):
       $message = "The same currency is required
         (expected: $this->currency; but was $other->currency)";
@@ -224,8 +231,7 @@ abstract class Money {
    *    <b>FALSE</b> otherwise.
    * @throws InvalidArgumentException
    */
-  public function greaterThan(Money $other)
-  {
+  public function greaterThan(Money $other) {
     return 1 == $this->compare($other);
   }
 
@@ -237,8 +243,7 @@ abstract class Money {
    *                 <b>FALSE</b> otherwise.
    * @throws InvalidArgumentException
    */
-  public function lessThan(Money $other)
-  {
+  public function lessThan(Money $other) {
     return -1 == $this->compare($other);
   }
 
@@ -248,8 +253,7 @@ abstract class Money {
    * @return boolean <b>TRUE</b> if the amount is zero;
    *                 <b>FALSE</b> otherwise.
    */
-  public function isZero()
-  {
+  public function isZero() {
     return 0 == $this->amount;
   }
 
@@ -259,8 +263,7 @@ abstract class Money {
    * @return boolean <b>TRUE</b> if the amount is positive;
    *                 <b>FALSE</b> otherwise.
    */
-  public function isPositive()
-  {
+  public function isPositive() {
     return 0 < $this->amount;
   }
 
@@ -270,8 +273,7 @@ abstract class Money {
    * @return boolean <b>TRUE</b> if the amount is negative;
    *                 <b>FALSE</b> otherwise.
    */
-  public function isNegative()
-  {
+  public function isNegative() {
     return 0 > $this->amount;
   }
 
@@ -295,8 +297,7 @@ abstract class Money {
    * @return integer amount of <i>Money</i> or the given integer value.
    * @throws InvalidArgument
    */
-  protected function _pickValue($given, $method = NULL)
-  {
+  protected function _pickValue($given, $method = NULL) {
     if ($given instanceof Money):
       if (!$this->currency->equals($given->currency)):
         $message = "The same currency is required
@@ -304,11 +305,11 @@ abstract class Money {
         throw new DifferentCurrencies($message);
       endif;
       $method = (isset($method)) ? __METHOD__ : $method;
-      $value = $given->amount;
+      $value  = $given->amount;
     else:
-      if (!\is_int($given)):
-        $type = \gettype($given);
-        $message = "Argument 1 requires integer, but was $type";
+      if (!\is_integer($given) && !\is_float($given)):
+        $type    = \gettype($given);
+        $message = "Argument 1 requires integer or float, but was $type";
         throw new InvalidArgument($message);
       endif;
       $value = $given;
@@ -323,8 +324,7 @@ abstract class Money {
    *    <i>The Currency object of the other object</i>, if amount is 0;
    *    <i>This Currency object</i></p> otherwise.
    */
-  protected function _pickCurrency(Money $other)
-  {
+  protected function _pickCurrency(Money $other) {
     return ($this->amount == 0) ? $other->currency : $this->currency;
   }
 
@@ -338,12 +338,10 @@ abstract class Money {
    * @param mixed $object
    * @return boolean
    */
-  public function equals($object)
-  {
+  public function equals($object) {
     $equals = FALSE;
     if ($object instanceof Money):
-      $equals = $this->currency->equals($object->currency)
-              && $this->amount == $object->amount;
+      $equals = $this->currency->equals($object->currency) && $this->amount == $object->amount;
     endif;
     return $equals;
   }
@@ -353,8 +351,7 @@ abstract class Money {
    *
    * @return type
    */
-  public function identify()
-  {
+  public function identify() {
     return "$this->amount $this->currency";
   }
 
@@ -364,8 +361,8 @@ abstract class Money {
    * @return string ("amount" "currency")
    * @see \mitgedanken\Monetary\Currency
    */
-  public function __toString()
-  {
+  public function __toString() {
     return "$this->amount $this->currency";
   }
+
 }
