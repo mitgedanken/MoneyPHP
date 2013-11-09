@@ -20,25 +20,14 @@
 namespace mitgedanken\Monetary\Exceptions;
 
 /**
- * TODO
+ * A marker interface for this package.
+ *
+ * @author Sascha Tasche <hallo@mitgedanken.de>
  */
-class DivisionByZero extends InvalidArgument
+interface Monetary
 {
 
-  /**
-   * Exception code.
-   */
-  const CODE = 1418;
+  const VERSION = "13.44.0-alpha";
 
-  protected function format($causeMessage = NULL)
-  {
-    $message = 'Division by zero';
-    if (empty($causeMessage)):
-      $message .= '.';
-    else:
-      $message .= ', reason: ' . \trim($causeMessage);
-    endif;
-    return $message;
-  }
-
+  /* Marker interface */
 }

@@ -8,14 +8,15 @@ namespace mitgedanken\TestingOnly;
  * @author Sascha Tasche <hallo@mitgedanken.de>
  */
 class CurrencyPairCriteriaMock
-        implements \mitgedanken\Monetary\Interfaces\CurrencyPairCriteria {
+      implements \mitgedanken\Monetary\Interfaces\CurrencyPairCriteria
+{
 
   private $baseCurrency;
   private $counterCurrency;
 
   public function set($baseCurrency, $counterCurrency)
   {
-    $this->baseCurrency = $baseCurrency;
+    $this->baseCurrency    = $baseCurrency;
     $this->counterCurrency = $counterCurrency;
   }
 
@@ -28,4 +29,5 @@ class CurrencyPairCriteriaMock
   {
     return $this->counterCurrency;
   }
+
 }

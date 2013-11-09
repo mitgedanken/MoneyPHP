@@ -24,7 +24,8 @@ namespace mitgedanken\Monetary\Exceptions;
  *
  * @author Sascha Tasche <hallo@mitgedanken.de>
  */
-class Exception extends \Exception implements MonetaryException {
+class Exception extends \Exception implements Monetary
+{
 
   /**
    * Exception code.
@@ -38,10 +39,9 @@ class Exception extends \Exception implements MonetaryException {
    * @param integer $code [recommended]  Exception code.
    * @param \Exception $previous [optional] Previous exception.
    */
-  public function __construct($message = NULL, $code = NULL,
-                              \Exception $previous = NULL)
+  public function __construct($message = NULL, $code = NULL, \Exception $previous = NULL)
   {
-    $code = isset($code) ? $code : static::CODE;
+    $code    = isset($code) ? $code : static::CODE;
     $message = $this->format($message);
     parent::__construct($message, $code, $previous);
   }
@@ -57,4 +57,5 @@ class Exception extends \Exception implements MonetaryException {
     $message .= ' reason: ' . \trim($causeMessage);
     return $message;
   }
+
 }

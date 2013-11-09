@@ -1,15 +1,19 @@
 CHANGE LOG
 ==========
 
-13.26.1-alpha
+
+13.44.0-alpha
 -------------
 maximum-stability: dev
 
 * Changes
- -
+ - MoneyConverter replaced by Exchange.
+ - new class Algorithms.
+ - Money: now without algorithms; see class Algorihtms.
+ - MoneyBag without allocation algorithms; moved to class Algorithms
 
 
-13.43.0-alpha
+13.43.1-alpha
 -------------
 maximum-stability: dev
 
@@ -29,6 +33,12 @@ maximum-stability: dev
 
 * Some improvements an fixes
 
+13.26.1-alpha
+-------------
+maximum-stability: dev
+
+* Changes
+ - ...
 
 13.22.2-alpha
 -------------

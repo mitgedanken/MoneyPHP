@@ -24,7 +24,8 @@ namespace mitgedanken\Monetary\Exceptions;
  *
  * @author Sascha Tasche <hallo@mitgedanken.de>
  */
-class BadFunctionCall extends LogicException {
+class BadFunctionCall extends LogicException
+{
 
   const CODE = 1001;
 

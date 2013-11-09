@@ -17,28 +17,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace mitgedanken\Monetary\Exceptions;
+namespace mitgedanken\Monetary\Classes;
 
 /**
- * TODO
+ * MonetaryStorage.
+ *
+ * @author Sascha Tasche <hallo@mitgedanken.de>
  */
-class DivisionByZero extends InvalidArgument
+class MonetaryStorage extends \SplObjectStorage
+      implements \mitgedanken\Monetary\Interfaces\MonetaryStorage
 {
 
-  /**
-   * Exception code.
-   */
-  const CODE = 1418;
+  use \mitgedanken\Monetary\Traits\Monetary;
 
-  protected function format($causeMessage = NULL)
+  /**
+   * <p><i>Override</i></p>
+   * Calculate a unique identifier for the contained objects.<br/>
+   *
+   * @link http://php.net/manual/en/splobjectstorage.gethash.php
+   * @param object $object The object whose identifier is to be calculated.
+   * @return string A string with the calculated identifier.
+   */
+  public function getHash($object)
   {
-    $message = 'Division by zero';
-    if (empty($causeMessage)):
-      $message .= '.';
-    else:
-      $message .= ', reason: ' . \trim($causeMessage);
-    endif;
-    return $message;
+    assert($object instanceof \mitgedanken\Monetary\Abstracts\Money);
+    return $object->identify();
   }
 
 }

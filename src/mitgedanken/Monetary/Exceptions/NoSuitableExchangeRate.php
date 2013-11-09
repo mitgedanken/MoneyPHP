@@ -20,11 +20,12 @@
 namespace mitgedanken\Monetary\Exceptions;
 
 /**
- * Description of NoSuitableExchangeRate
+ * NoSuitableExchangeRate.
  *
  * @author Sascha Tasche <hallo@mitgedanken.de>
  */
-class NoSuitableExchangeRate extends RuntimeException {
+class NoSuitableExchangeRate extends Logic
+{
 
   protected function format($causeMessage = NULL)
   {
@@ -32,5 +33,5 @@ class NoSuitableExchangeRate extends RuntimeException {
     $message .= ' reason: ' . \trim($causeMessage);
     return $message;
   }
-}
 
+}

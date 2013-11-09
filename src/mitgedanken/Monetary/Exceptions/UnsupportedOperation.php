@@ -24,7 +24,8 @@ namespace mitgedanken\Monetary\Exceptions;
  *
  * @author Sascha Tasche <hallo@mitgedanken.de>
  */
-class UnsupportedOperation extends Exception {
+class UnsupportedOperation extends Exception
+{
 
   /**
    * Exception code.
@@ -37,4 +38,5 @@ class UnsupportedOperation extends Exception {
     $message .= ' reason: ' . \trim($causeMessage);
     return $message;
   }
+
 }

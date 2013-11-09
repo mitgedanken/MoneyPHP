@@ -24,7 +24,8 @@ namespace mitgedanken\Monetary\Exceptions;
  *
  * @author Sascha Tasche <hallo@mitgedanken.de>
  */
-class RuntimeException extends Exception {
+class RuntimeException extends Exception
+{
 
   const CODE = -1;
 
@@ -34,4 +35,5 @@ class RuntimeException extends Exception {
     $message .= ' reason: ' . \trim($causeMessage);
     return $message;
   }
+
 }

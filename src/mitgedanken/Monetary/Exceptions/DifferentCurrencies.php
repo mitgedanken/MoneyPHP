@@ -24,7 +24,8 @@ namespace mitgedanken\Monetary\Exceptions;
  *
  * @author Sascha Tasche <hallo@mitgedanken.de>
  */
-class DifferentCurrencies extends LogicException {
+class DifferentCurrencies extends Logic
+{
 
   /**
    * Exception code.
@@ -38,7 +39,7 @@ class DifferentCurrencies extends LogicException {
    */
   protected function format($causeMessage = NULL)
   {
-    $message = 'Different currencies';
+    $message      = 'Different currencies';
     $causeMessage = \trim($causeMessage);
     if (empty($causeMessage)):
       $message .= '.';
@@ -47,4 +48,5 @@ class DifferentCurrencies extends LogicException {
     endif;
     return $message;
   }
+
 }

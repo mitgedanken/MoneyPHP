@@ -20,25 +20,16 @@
 namespace mitgedanken\Monetary\Exceptions;
 
 /**
- * TODO
+ * LogicException.
+ *
+ * @author Sascha Tasche <hallo@mitgedanken.de>
  */
-class DivisionByZero extends InvalidArgument
+class Logic extends Exception
 {
 
   /**
    * Exception code.
    */
-  const CODE = 1418;
-
-  protected function format($causeMessage = NULL)
-  {
-    $message = 'Division by zero';
-    if (empty($causeMessage)):
-      $message .= '.';
-    else:
-      $message .= ', reason: ' . \trim($causeMessage);
-    endif;
-    return $message;
-  }
+  const CODE = 1000;
 
 }

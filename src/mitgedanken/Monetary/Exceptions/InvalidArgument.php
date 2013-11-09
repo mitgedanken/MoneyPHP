@@ -24,7 +24,8 @@ namespace mitgedanken\Monetary\Exceptions;
  *
  * @author Sascha Tasche <hallo@mitgedanken.de>
  */
-class InvalidArgument extends LogicException {
+class InvalidArgument extends Logic
+{
 
   /**
    * Exception code.
@@ -42,4 +43,5 @@ class InvalidArgument extends LogicException {
     $message .= ' reason: ' . \trim($causeMessage);
     return $message;
   }
+
 }

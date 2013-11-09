@@ -28,15 +28,14 @@ trait Monetary {
 
   /**
    * Indicates whether this object is "equal to" another.</br>
-   * This object is "equal to" another if they are t he same object.
+   * This object is "equal to" another if they are the same object.
    *
    * @param mixed $object
    * @return boolean
    *    <i>TRUE</i> if this object is "equal to" parameter $object;
    *    <i>FALSE</i> otherwise.
    */
-  public function equals($object)
-  {
+  public function equals($object) {
     return \is_object($object) && $this === $object;
   }
 
@@ -45,8 +44,15 @@ trait Monetary {
    *
    * @return string
    */
-  public function identify()
-  {
+  public function identify() {
     return get_called_class();
   }
+
+  /**
+   * Returns its version number.
+   */
+  public function getVersion() {
+    return "13.44.0-alpha";
+  }
+
 }

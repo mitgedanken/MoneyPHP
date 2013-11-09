@@ -24,7 +24,8 @@ namespace mitgedanken\Monetary\Exceptions;
  *
  * @author Sascha Tasche <hallo@mitgedanken.de>
  */
-class Length extends LogicException {
+class Length extends LogicException
+{
 
   /**
    * Exception code.
@@ -37,5 +38,5 @@ class Length extends LogicException {
     $message .= ' reason: ' . \trim($causeMessage);
     return $message;
   }
-}
 
+}
