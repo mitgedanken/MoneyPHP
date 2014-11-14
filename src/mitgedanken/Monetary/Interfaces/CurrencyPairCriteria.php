@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2013 Sascha Tasche <hallo@mitgedanken.de>
+ * Copyright (C) 2014 Sascha Tasche <hallo@mitgedanken.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,21 +24,22 @@ namespace mitgedanken\Monetary\Interfaces;
  *
  * @author Sascha Tasche <hallo@mitgedanken.de>
  */
-interface CurrencyPairCriteria {
+interface CurrencyPairCriteria
+{
 
   /**
    * Return the searched base currency or <i>NULL</i> if this criterion must
    * not be fulfilled.
    *
-   * @return Currency|NULL (NULL only if this criterion must not be fulfilled)
+   * @return Currency|NULL (NULL If and only if this criterion must not be fulfilled)
    */
   function getBaseCurrency();
 
   /**
-   * Return the searched counter currency or <i>NULL</i> if this criterion must
+   * Return the searched \counter currency or <i>NULL</i> if this criterion must
    * not be fulfilled.
    *
-   * @return Currency|NULL (NULL only if this criterion must not be fulfilled)
+   * @return Currency|NULL (NULL If and only if this criterion must not be fulfilled)
    */
   function getCounterCurrency();
 }

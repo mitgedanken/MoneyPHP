@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2013 Sascha Tasche <hallo@mitgedanken.de>
+ * Copyright (C) 2014 Sascha
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,329 +19,136 @@
 
 namespace mitgedanken\Monetary\Abstracts;
 
-use mitgedanken\Monetary\Classes\Currency;
-use mitgedanken\Monetary\Exceptions\InvalidArgument,
-    mitgedanken\Monetary\Exceptions\DivisionByZero,
-    mitgedanken\Monetary\Exceptions\DifferentCurrencies;
+use mitgedanken\Monetary\Interfaces\Money as InterfacesMoney;
+use mitgedanken\Monetary\Currency;
 
 /**
- * <i>Immutable</i></br>
- * This interface specifies a monetary value object based on Money by Martin Fowler.
+ * <i>Immutable</i><br/>
+ * An implementation of <i>Interfaces\Money</i> by Fowler.
  *
  * @author Sascha Tasche <hallo@mitgedanken.de>
  */
-abstract class Money
-{
+abstract class Money implements InterfacesMoney {
 
-  use \mitgedanken\Monetary\Traits\Monetary;
+    use Traits\Monetary;
 
-  const DEFAULT_SCALE = 12;
+    /**
+     * This amount.
+     *
+     * @var mitgedanken\Monetary\Interfaces\Number
+     */
+    protected $number;
 
-  /**
-   * This amount.
-   *
-   * @var integer|float
-   */
-  protected $amount;
+    /**
+     * Holds the Currency object.
+     * @var Currency
+     */
+    protected $currency;
 
-  /**
-   * Holds the Currency object.
-   *
-   * @var \mitgedanken\Monetary\Classes\Currency
-   */
-  protected $currency;
+    /**
+     * Return its ammount.<br>
+     *
+     * @return integer Its ammount.
+     */
+    public function getAmount()
+    {
+        return $this->number->toInteger();
+    }
 
-  /**
-   * Holds the scale used by all bc* functions.
-   *
-   * @var integer
-   */
-  protected $scale;
+    /**
+     * Retuns its currency object.<br>
+     *
+     * @return Currency Its currency object.
+     */
+    public function getCurrency()
+    {
+        return $this->currency;
+    }
 
-  /**
-   * Constructs this <i>Money</i> object.
-   *
-   * @param integer $amount Its amount.
-   * @param \mitgedanken\Monetary\Currency $currency Its currency.
-   * @throws InvalidArgument
-   */
-  public function __construct($amount, Currency $currency, $scale = 12)
-  {
-    if (!\is_integer($amount) && !\is_float($amount)):
-      $type    = \gettype($amount);
-      $message = "Argument 1 requires integer or float, but was $type";
-      throw new InvalidArgument($message);
-    endif;
-    if (!\is_integer($scale)):
-      $type    = \gettype($scale);
-      $message = "Argument 1 requires integer, but was $type";
-      throw new InvalidArgument($message);
-    endif;
-    $this->currency = $currency;
-    $this->amount   = $amount;
-    $this->scale    = $scale;
-  }
+    /**
+     * Compares this <i>Interfaces\Money</i> object to another with the same currency.<br>
+     * If both monetary values are zero, they currency must not be the same.<br>
+     *
+     * @param \mitgedanken\Monetary\Money $money the other <i>Money</i>.
+     * @return integer
+     *    0 if they are equal,
+     *    -1 if the other amount is greater or
+     *    1 if the other amount is less.
+     */
+    public function compare(Interfaces\Money $money)
+    {
+        $this->_OnWrongCurrency_ThrowException($money);
+        return $this->number->compare($money->number);
+    }
 
-  /**
-   * Returns its ammount.
-   *
-   * @return integer Its ammount.
-   */
-  public function getAmount()
-  {
-    return $this->amount;
-  }
+    /**
+     * Checks if this <i>Interfaces\Money</i> object is greater than the other.<br>
+     *
+     * @param  mixed $money
+     * @return boolean
+     *    <b>TRUE</b> if the value is greater than the other;
+     *    <b>FALSE</b> otherwise.
+     */
+    public function greaterThan(Interfaces\Money $money)
+    {
+        return 1 == $this->compare($money);
+    }
 
-  /**
-   * Retuns its currency object.
-   *
-   * @return \mitgedanken\Monetary\Currency Its currency object.
-   */
-  public function getCurrency()
-  {
-    return $this->currency;
-  }
+    /**
+     * Checks if this <i>Interfaces\Money</i> object is less than the other.<br>
+     *
+     * @param  mixed $money
+     * @return boolean <b>TRUE</b> if the value is less than the other.
+     *                 <b>FALSE</b> otherwise.
+     */
+    public function lessThan(Interfaces\Money $money)
+    {
+        return -1 == $this->compare($money);
+    }
 
-  /**
-   * Returns a new <i>Money</i> object that represents the monetary value
-   * of the sum of this <i>Money</i> object and another.
-   *
-   * @param \mitgedanken\Monetary\Money $addend
-   * @param boolean $rounding [default: FALSE] rounds the result if </i>TRUE</i>
-   * @return \mitgedanken\Monetary\Money
-   * @throws InvalidArgumentException
-   * @throws DifferentCurrencies If $addend has a different currency.
-   */
-  abstract public function add(Money $addend);
+    /**
+     * Checks if this <i>Interfaces\Money</i> object is equal to the other.<br>
+     *
+     * @param  Interfaces\Money $money
+     * @return boolean <b>TRUE</b> if the value is less than the other.
+     *                 <b>FALSE</b> otherwise.
+     */
+    public function equally(Interfaces\Money $money)
+    {
+        return 0 == $this->compare($money);
+    }
 
-  /**
-   * Returns a new <i>Money</i> object that represents the monetary value
-   * of the difference of this <i>Money</i> object and another.
-   *
-   * @param \mitgedanken\Monetary\Money $subtrahend
-   * @param boolean $rounding [default: FALSE] rounds the result if </i>TRUE</i>
-   * @return \mitgedanken\Monetary\Money
-   * @throws InvalidArgumentException
-   */
-  abstract public function subtract(Money $subtrahend);
+    /**
+     * Return its identifier.
+     *
+     * @return string value
+     */
+    public function identify()
+    {
+        return \get_class() . '(' . $this->number->identify() . ')#'
+                . $this->currency->identify();
+    }
 
-  /**
-   * Returns a new <i>Money</i> object that represents the monetary value
-   * of this <i>Money</i> object multiplied by a given factor.
-   *
-   * @see _multiplyAlgo
-   * @param  float|integer $multiplier
-   * @param boolean $rounding [default: FALSE] rounds the result if </i>TRUE</i>
-   * @return \mitgedanken\Monetary\Money
-   * @throws InvalidArgument
-   */
-  abstract public function multiply($multiplier);
+    /**
+     * Indicates whether this object is "equal to" another.<br/>
+     * This object is "equal to" another if it is an instance of <i>Interfaces\Money</i>
+     * and if its value and currency are "equal to" the other one.<br/>
+     *
+     * @param mixed $object
+     * @return boolean
+     */
+    public function equals($object)
+    {
+        $equals = FALSE;
+        if ($object instanceof Interfaces\Money):
+            $equals = 0 == strcmp($this->number, $object->number);
+        endif;
+        return $equals;
+    }
 
-  /**
-   * Returns a new <i>Money</i> object that represents the monetary value
-   * of this <i>Money</i> object divided by a given divisor.
-   *
-   * @param  integer|\mitgedanken\Monetary\Money $divisor
-   * @param boolean $rounding [default: FALSE] rounds the result if </i>TRUE</i>
-   * @return \mitgedanken\Monetary\Money
-   * @throws InvalidArgumentException
-   * @throws DivisionByZero
-   */
-  abstract public function divide($divisor);
-
-  /**
-   * Return a new <i>Money</i> object that represents the negated monetary value
-   * of this <i>Money</i> object.
-   *
-   * @return \mitgedanken\Monetary\Abstracts\Money
-   */
-  public function negate()
-  {
-    return $this->_newMoney(-$this->amount);
-  }
-
-  /**
-   * Compares this <i>Money</i> object to another with the same currency.
-   * If both monetary values are zero, they currency must not be the same.
-   *
-   * @param \mitgedanken\Monetary\Money $other the other <i>Money</i>.
-   * @return integer
-   *    0 if they are equal,
-   *    -1 if the other amount is greater or
-   *    1 if the other amount is less.
-   * @throws InvalidArgumentException
-   */
-  public function compare(Money $other)
-  {
-    $this->_testIfHaveSameCurrency($other);
-    if ($this->amount == $other->amount):
-      $compared = 0;
-    else:
-      $compared = $this->amount < $other->amount ? -1 : 1;
-    endif;
-    return $compared;
-  }
-
-  /**
-   * Checks if this <i>Money</i> object is greater than the other.
-   *
-   * @param \mitgedanken\Monetary\Money $other
-   * @return boolean
-   *    <b>TRUE</b> if the value is greater than the other;
-   *    <b>FALSE</b> otherwise.
-   * @throws InvalidArgumentException
-   */
-  public function greaterThan(Money $other)
-  {
-    return 1 == $this->compare($other);
-  }
-
-  /**
-   * Checks if this <i>Money</i> object is less than the other.
-   *
-   * @param \mitgedanken\Monetary\Money $other
-   * @return boolean <b>TRUE</b> if the value is less than the other.
-   *                 <b>FALSE</b> otherwise.
-   * @throws InvalidArgumentException
-   */
-  public function lessThan(Money $other)
-  {
-    return -1 == $this->compare($other);
-  }
-
-  /**
-   * Checks if the amount is zero.
-   *
-   * @return boolean <b>TRUE</b> if the amount is zero;
-   *                 <b>FALSE</b> otherwise.
-   */
-  public function isZero()
-  {
-    return 0 == $this->amount;
-  }
-
-  /**
-   * Checks if the amount is positive.
-   *
-   * @return boolean <b>TRUE</b> if the amount is positive;
-   *                 <b>FALSE</b> otherwise.
-   */
-  public function isPositive()
-  {
-    return 0 < $this->amount;
-  }
-
-  /**
-   * Checks if the amount is negative.
-   *
-   * @return boolean <b>TRUE</b> if the amount is negative;
-   *                 <b>FALSE</b> otherwise.
-   */
-  public function isNegative()
-  {
-    return 0 > $this->amount;
-  }
-
-  /**
-   * Constructs a new <i>Money</i> object with the same currency as this object.
-   *
-   * @param integer $amount
-   * @param \mitgedanken\Monetary\Money $other
-   * @return \mitgedanken\Monetary\Money
-   * @throws InvalidArgument
-   */
-  abstract protected function _newMoney($amount, $other = NULL);
-
-  /**
-   * Return an integer of <i>$given</i>. If it is a <i>Money</i>,
-   * it Return its amount, only if it is Zero;
-   * if it is an <i>integer</i>, it Return its value.
-   *
-   * @param integer|\mitgedanken\Monetary\Money $given
-   *    Amount of <i>Money</i> or integer value.
-   * @return integer amount of <i>Money</i> or the given integer value.
-   * @throws InvalidArgument
-   */
-  protected function _pickValue($given, $method = NULL)
-  {
-    if ($given instanceof Money):
-      $this->_testIfHaveSameCurrency($given);
-      $method = (isset($method)) ? __METHOD__ : $method;
-      $value  = $given->amount;
-    else:
-      if (!\is_integer($given) && !\is_float($given)):
-        $type    = \gettype($given);
-        $message = "Argument 1 requires integer or float, but was $type";
-        throw new InvalidArgument($message);
-      endif;
-      $value = $given;
-    endif;
-    return $value;
-  }
-
-  /**
-   * Returns the <i>Currency</i> object of the other object, if amount is 0.
-   *
-   * @return \mitgedanken\Monetary\Currency
-   *    <i>The Currency object of the other object</i>, if amount is 0;
-   *    <i>This Currency object</i></p> otherwise.
-   */
-  protected function _pickCurrency(Money $other)
-  {
-    return $this->amount == 0 ? $other->currency : $this->currency;
-  }
-
-  /**
-   * TODO
-   * Indicates whether this object is "equal to" another.<br/>
-   * This object is "equal to" another if this is an instance of <i>Money</i>
-   * and if their amounts and currencies are "equal to".<br/>
-   * <i>Note</i>: "Equal to" for amounts is indicated via '=='.
-   *
-   * @param mixed $object
-   * @return boolean
-   */
-  public function equals($object)
-  {
-    $equals = FALSE;
-    if ($object instanceof Money):
-      $equals = $this->currency->equals($object->currency) && $this->amount == $object->amount;
-    endif;
-    return $equals;
-  }
-
-  /**
-   * Returns its identifier.
-   *
-   * @return type
-   */
-  public function identify()
-  {
-    return "$this->amount $this->currency";
-  }
-
-  /**
-   * Returns this <i>Money</i> object as a string.
-   *
-   * @return string ("amount" "currency")
-   * @see \mitgedanken\Monetary\Currency
-   */
-  public function __toString()
-  {
-    return "$this->amount $this->currency";
-  }
-
-  /**
-   * Tests if the given <i>mitgedanken\Monetary\Abstracts\Money</i>'s has the
-   * same currency.
-   */
-  protected function _testIfHaveSameCurrency(Money $money)
-  {
-    if (!$this->currency->equals($money->currency)):
-      $message = "The same currency is required
-        (expected: $this->currency; but was $money->currency)";
-      throw new DifferentCurrencies($message);
-    endif;
-  }
+    public function __toString()
+    {
+        return \get_class() . '(' . $this->number->toString() . $this->currency->getName() . ')';
+    }
 
 }

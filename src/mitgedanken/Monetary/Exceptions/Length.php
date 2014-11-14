@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2013 Sascha Tasche <hallo@mitgedanken.de>
+ * Copyright (C) 2014 Sascha Tasche <hallo@mitgedanken.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,19 +24,21 @@ namespace mitgedanken\Monetary\Exceptions;
  *
  * @author Sascha Tasche <hallo@mitgedanken.de>
  */
-class Length extends LogicException
-{
+class Length extends Logic {
 
-  /**
-   * Exception code.
-   */
-  const CODE = 1410;
+    /**
+     * Exception code.
+     */
+    const CODE = 1001;
 
-  protected function format($causeMessage = NULL)
-  {
-    $message = 'Invalid length,';
-    $message .= ' reason: ' . \trim($causeMessage);
-    return $message;
-  }
+    /**
+     * Formats the message string for this exception.
+     *
+     * @param string $causeMessage
+     */
+    protected function format($causeMessage = NULL) {
+        assert(\is_string($causeMessage) || \is_null($causeMessage), '$causeMessage is a string');
+        return 'Wrong length' . self::reasonIfKnown($causeMessage);
+    }
 
 }

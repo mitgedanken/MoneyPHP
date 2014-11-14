@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2013 Sascha Tasche <hallo@mitgedanken.de>
+ * Copyright (C) 2014 Sascha Tasche <hallo@mitgedanken.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,19 +24,18 @@ namespace mitgedanken\Monetary\Exceptions;
  *
  * @author Sascha Tasche <hallo@mitgedanken.de>
  */
-class NoExchangeRatesDefined extends RuntimeException
-{
+class NoExchangeRatesDefined extends RuntimeException {
 
-  protected function format($causeMessage = NULL)
-  {
-    $message      = 'No exchange rates defined ';
-    $causeMessage = \trim($causeMessage);
-    if (empty($causeMessage)):
-      $message .= '.';
-    else:
-      $message .= ', reason: ' . $causeMessage;
-    endif;
-    return $message;
-  }
+    protected function format($causeMessage = NULL) {
+        assert(\is_string($causeMessage), '$causeMessage is a string');
+        $message = 'No exchange rates defined ';
+        $causeMessage = \trim($causeMessage);
+        if (empty($causeMessage)):
+            $message .= '.';
+        else:
+            $message .= ', reason: ' . $causeMessage;
+        endif;
+        return $message;
+    }
 
 }

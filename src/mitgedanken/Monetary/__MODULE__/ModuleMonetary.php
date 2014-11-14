@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2013 Sascha Tasche <hallo@mitgedanken.de>
+ * Copyright (C) 2014 Sascha Tasche <hallo@mitgedanken.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,56 +29,56 @@ define('MODULE_MONETARY', __DIR__ . DIRECTORY_SEPARATOR . 'module');
  */
 class ModuleMonetary {
 
-  public function request($service) {
+    public function request($service) {
 
-    return $service;
-  }
-
-  /**
-   *
-   */
-  public function register($registry) {
-    $registry->register(ModuleMonetary::info());
-  }
-
-  /**
-   * Registers the autoloader.
-   *
-   * @param string $class
-   */
-  public static function load($class) {
-    set_include_path(get_include_path() . PATH_SEPARATOR . __DIR__ . DIRECTORY_SEPARATOR . '..' . '..');
-    // Autoloader (source: https://gist.github.com/adriengibrat/4761717#comment-773452)
-    spl_autoload_register(
-          function($class) {
-      include_once preg_replace('#\\\|(?!.*\\\)#', '/', $class) . '.php';
+        return $service;
     }
-    );
-  }
 
-  /**
-   * Returns the information.
-   *
-   * @return array
-   */
-  public static function info() {
-    return [
-      'name' => 'MoneyPHP',
-      'id' => 'mitgedanken::MoneyPHP@13.44.0-alpha',
-      'desc' => 'A monetary value object based on Money by Martin Fowler.',
-      'version' => '13.44.0-alpha',
-      'min_stability' => 'dev',
-      'require' => [],
-      'forkOf' => '',
-      'php' => '>=5.4.0',
-      'path' => __DIR__,
-      'maintainer' => 'mitgedanken (Sascha Tasche)',
-      'authors' => [0 => 'Sascha Tasche'],
-      'repository' => 'https://github.com/mitgedanken/MoneyPHP',
-      'licence' => 'GPL-3',
-      'doc' => '',
-      'website' => ''];
-    ;
-  }
+    /**
+     *
+     */
+    public function register($registry) {
+        $registry->register(ModuleMonetary::info());
+    }
+
+    /**
+     * Registers the autoloader.
+     *
+     * @param string $class
+     */
+    public static function load($class) {
+        set_include_path(get_include_path() . PATH_SEPARATOR . __DIR__ . DIRECTORY_SEPARATOR . '..' . '..');
+        // Autoloader (source: https://gist.github.com/adriengibrat/4761717#comment-773452)
+        spl_autoload_register(
+                function($class) {
+            include_once preg_replace('#\\|(?!.*\\)#', '/', $class) . '.php';
+        }
+        );
+    }
+
+    /**
+     * It returns the information.
+     *
+     * @return array
+     */
+    public static function info() {
+        return [
+            'name' => 'MoneyPHP',
+            'id' => 'mitgedanken::MoneyPHP@13.44.0-alpha',
+            'desc' => 'A monetary value object based on Money by Martin Fowler.',
+            'version' => '13.44.0-alpha',
+            'min_stability' => 'dev',
+            'require' => [],
+            'forkOf' => '',
+            'php' => '>=5.4.0',
+            'path' => __DIR__,
+            'maintainer' => 'mitgedanken (Sascha Tasche)',
+            'authors' => [0 => 'Sascha Tasche'],
+            'repository' => 'https://github.com/mitgedanken/MoneyPHP',
+            'licence' => 'GPL-3',
+            'doc' => '',
+            'website' => ''];
+        ;
+    }
 
 }

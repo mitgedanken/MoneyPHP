@@ -16,7 +16,7 @@ class CurrencyPairCriteriaMock
 
   public function set($baseCurrency, $counterCurrency)
   {
-    $this->baseCurrency    = $baseCurrency;
+    $this->baseCurrency = $baseCurrency;
     $this->counterCurrency = $counterCurrency;
   }
 

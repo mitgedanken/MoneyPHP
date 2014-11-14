@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2013 Sascha Tasche <hallo@mitgedanken.de>
+ * Copyright (C) 2014 Sascha Tasche <hallo@mitgedanken.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,23 +20,29 @@
 namespace mitgedanken\Monetary\Exceptions;
 
 /**
- * UnsupportedOpertation
- *
- * @author Sascha Tasche <hallo@mitgedanken.de>
+ * Exception thrown if an operation is not supported.
  */
-class UnsupportedOperation extends Exception
-{
+class UnsupportedOperation extends Exception {
 
-  /**
-   * Exception code.
-   */
-  const CODE = 405;
+    /**
+     * Exception code.
+     */
+    const CODE = 405;
 
-  protected function format($causeMessage = NULL)
-  {
-    $message = 'Unsupported operation,';
-    $message .= ' reason: ' . \trim($causeMessage);
-    return $message;
-  }
+    /**
+     * Formats the message string for this exception.
+     *
+     * @param string $causeMessage
+     */
+    protected function format($causeMessage = NULL) {
+        assert(\is_string($causeMessage), '$causeMessage is a string');
+        $message = 'Unexpected operation';
+        if (\is_null($causeMessage)):
+            $message .= '.';
+        else:
+            $message .= ', reason: ' . \trim($causeMessage);
+        endif;
+        return $message;
+    }
 
 }

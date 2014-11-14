@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2013 Sascha Tasche <hallo@mitgedanken.de>
+ * Copyright (C) 2014 Sascha Tasche <hallo@mitgedanken.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ namespace mitgedanken\Monetary\Exceptions;
 interface Monetary
 {
 
-  const VERSION = "13.44.0-alpha";
+  static function getVersion();
 
-  /* Marker interface */
+  /* Marker interface for Exceptions */
 }

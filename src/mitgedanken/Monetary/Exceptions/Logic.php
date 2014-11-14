@@ -1,7 +1,9 @@
 <?php
 
+// version: 0.0.1-alpha+2714m0
+
 /*
- * Copyright (C) 2013 Sascha Tasche <hallo@mitgedanken.de>
+ * Copyright (C) 2014 Sascha Tasche <hallo@mitgedanken.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,12 +26,21 @@ namespace mitgedanken\Monetary\Exceptions;
  *
  * @author Sascha Tasche <hallo@mitgedanken.de>
  */
-class Logic extends Exception
-{
+class Logic extends Exception {
 
-  /**
-   * Exception code.
-   */
-  const CODE = 1000;
+    /**
+     * Exception code.
+     */
+    const CODE = 1000;
+
+    /**
+     * Formats the message string for this exception.
+     *
+     * @param string $causeMessage
+     */
+    protected function format($causeMessage = NULL) {
+        assert(\is_string($causeMessage) || \is_null($causeMessage), '$causeMessage is a string');
+        return 'Logic exception' . self::reasonIfKnown($causeMessage);
+    }
 
 }

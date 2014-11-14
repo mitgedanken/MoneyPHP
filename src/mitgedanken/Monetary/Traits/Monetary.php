@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2013 Sascha Tasche <hallo@mitgedanken.de>
+ * Copyright (C) 2014 Sascha Tasche <hallo@mitgedanken.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,33 +26,51 @@ namespace mitgedanken\Monetary\Traits;
  */
 trait Monetary {
 
-  /**
-   * Indicates whether this object is "equal to" another.</br>
-   * This object is "equal to" another if they are the same object.
-   *
-   * @param mixed $object
-   * @return boolean
-   *    <i>TRUE</i> if this object is "equal to" parameter $object;
-   *    <i>FALSE</i> otherwise.
-   */
-  public function equals($object) {
-    return \is_object($object) && $this === $object;
-  }
+    /**
+     * Holds the class configuration.
+     * @var Interfaces\Container
+     */
+    protected static $class_configuration;
 
-  /**
-   * Return its identifier.
-   *
-   * @return string
-   */
-  public function identify() {
-    return get_called_class();
-  }
+    /**
+     * Indicates whether this object is "equal to" another.</br>
+     * This object is "equal to" another if they are the same object.
+     *
+     * @param mixed $object
+     * @return boolean
+     *    <i>TRUE</i> if this object is "equal to" parameter $object;
+     *    <i>FALSE</i> otherwise.
+     */
+    public function equals($object)
+    {
+        return \is_object($object) && $this === $object;
+    }
 
-  /**
-   * Returns its version number.
-   */
-  public function getVersion() {
-    return "13.44.0-alpha";
-  }
+    /**
+     * Return its identifier.
+     *
+     * @return string
+     */
+    public function identify()
+    {
+        return get_class();
+    }
+
+    /**
+     * Return its version number.
+     *
+     * @return string Its version as string.
+     */
+    public static function version()
+    {
+        if (\in_array('VERSION', \get_defined_constants())):
+            $versionString = \get_class() . '(' . self::version . ')';
+        else:
+            $versionString = \get_class() . " Version unkown.\n"
+                    . 'Project global version is: '
+                    . MonetaryInterface::PROJECT_GLOBAL_VERSION;
+        endif;
+        return $versionString;
+    }
 
 }

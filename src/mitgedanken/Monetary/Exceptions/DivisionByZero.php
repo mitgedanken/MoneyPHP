@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (C) 2013 Sascha Tasche <hallo@mitgedanken.de>
+ * Copyright (C) 2014 Sascha Tasche <hallo@mitgedanken.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,23 +22,21 @@ namespace mitgedanken\Monetary\Exceptions;
 /**
  * TODO
  */
-class DivisionByZero extends InvalidArgument
-{
+class DivisionByZero extends InvalidArgument {
 
-  /**
-   * Exception code.
-   */
-  const CODE = 1418;
+    /**
+     * Exception code.
+     */
+    const CODE = 1001;
 
-  protected function format($causeMessage = NULL)
-  {
-    $message = 'Division by zero';
-    if (empty($causeMessage)):
-      $message .= '.';
-    else:
-      $message .= ', reason: ' . \trim($causeMessage);
-    endif;
-    return $message;
-  }
+    /**
+     * Formats the message string for this exception.
+     *
+     * @param string $causeMessage
+     */
+    protected function format($causeMessage = NULL) {
+        assert(\is_string($causeMessage) || \is_null($causeMessage), '$causeMessage is a string');
+        return 'Division by zero' . self::reasonIfKnown($causeMessage);
+    }
 
 }
